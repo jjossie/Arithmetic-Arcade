@@ -16,6 +16,8 @@ MAPS = [
     "maps/joel-demo.tmx"
 ]
 
+PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
+
 LAYER_NAME_WALLS = "walls"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_PLAYER = "player"
@@ -52,7 +54,11 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
-        """Set up the game here. Call this function to restart the game."""
+        """Set up the current map/scene/stage/level here. Call this function to restart the game.
+        The map file must be loaded first, then the scene object can be initialized from that.
+        Then the player sprite can be loaded and added to the scene afterward so that they draw
+        in the proper order.
+        """
 
         # Load the Tiled Map
         layer_options = {}
@@ -63,14 +69,11 @@ class MyGame(arcade.Window):
 
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
-        # self.scene.add_sprite_list(LAYER_NAME_WALLS, use_spatial_hash=True)
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = ":resources:images/animated_characters/male_person/malePerson_idle.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
         self.player_sprite.center_x = 500
         self.player_sprite.center_y = 375
-        # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
 
         # Create the 'physics engine'
