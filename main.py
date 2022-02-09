@@ -1,4 +1,5 @@
 import arcade
+from numbers_and_math import NumberBlock
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -6,7 +7,7 @@ SCREEN_HEIGHT = 750
 SCREEN_TITLE = "RUNTIME TERROR"
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5 
+PLAYER_MOVEMENT_SPEED = 5
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.75
@@ -24,6 +25,7 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
 
         # Our scene object
+        self.number1 = None
         self.scene = None
 
         # Separate variable that holds the player sprite
@@ -48,6 +50,7 @@ class MyGame(arcade.Window):
         # Create the Sprite lists
         self.scene.add_sprite_list("Player")
         self.scene.add_sprite_list("Walls", use_spatial_hash=True)
+        self.scene.add_sprite_list("Numbers")
 
         # Set up the player, specifically placing it at these coordinates.
         image_source = ":resources:images/animated_characters/male_person/malePerson_idle.png"
@@ -57,6 +60,10 @@ class MyGame(arcade.Window):
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite("Player", self.player_sprite)
 
+        self.number1 = NumberBlock(4)
+        self.number1.center_x = 400
+        self.number1.center_y = 200
+        self.scene.add_sprite("Numbers", self.number1)
 
         # Create the ground
         # This shows using a loop to place multiple sprites horizontally
@@ -106,6 +113,9 @@ class MyGame(arcade.Window):
 
         # Draw our Scene
         self.scene.draw()
+
+        # Draw Math Layer
+        self.scene.get_sprite_list("Numbers").update_animation()
 
     def update_player_speed(self):
 
