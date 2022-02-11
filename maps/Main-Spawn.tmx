@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="1">
- <tileset firstgid="1" source="../../../Tiled Work/SHEET.tsx"/>
+<map version="1.8" tiledversion="1.8.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="1">
+ <tileset firstgid="1" source="tilesets/roguelikeSheet_transparent_32px.tsx"/>
  <layer id="1" name="Bottom Grass" width="50" height="50">
   <data encoding="csv">
 1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,1608,1606,1607,
