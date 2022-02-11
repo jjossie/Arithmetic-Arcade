@@ -6,11 +6,21 @@ SCREEN_HEIGHT = 750
 SCREEN_TITLE = "RUNTIME TERROR"
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5 
+PLAYER_MOVEMENT_SPEED = 5
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.75
-TILE_SCALING = 0.5
+TILE_SCALING = 1
+
+MAPS = [
+    "maps/joel-demo.tmx"
+]
+
+PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
+
+LAYER_NAME_WALLS = "walls"
+LAYER_NAME_BACKGROUND = "background"
+LAYER_NAME_PLAYER = "player"
 
 
 class MyGame(arcade.Window):
@@ -37,65 +47,38 @@ class MyGame(arcade.Window):
         # Our physics engine
         self.physics_engine = None
 
+        # Game Logic
+        self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
+        self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
+
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
-        """Set up the game here. Call this function to restart the game."""
+        """Set up the current map/scene/stage/level here. Call this function to restart the game.
+        The map file must be loaded first, then the scene object can be initialized from that.
+        Then the player sprite can be loaded and added to the scene afterward so that they draw
+        in the proper order.
+        """
 
-        # Initialize Scene
-        self.scene = arcade.Scene()
+        # Load the Tiled Map
+        layer_options = {}
+        self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
+
+        # Initialize Scene from the tilemap
+        self.scene = arcade.Scene.from_tilemap(self.tile_map)
 
         # Create the Sprite lists
-        self.scene.add_sprite_list("Player")
-        self.scene.add_sprite_list("Walls", use_spatial_hash=True)
+        self.scene.add_sprite_list(LAYER_NAME_PLAYER)
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = ":resources:images/animated_characters/male_person/malePerson_idle.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
         self.player_sprite.center_x = 500
         self.player_sprite.center_y = 375
-        # self.player_list.append(self.player_sprite)
-        self.scene.add_sprite("Player", self.player_sprite)
-
-
-        # Create the ground
-        # This shows using a loop to place multiple sprites horizontally
-        for x in range(0, 1250, 64):
-            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 32
-            self.scene.add_sprite("Walls", wall)
-        for x in range(0, 1250, 64):
-            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 718
-            self.scene.add_sprite("Walls", wall)
-        for y in range(0, 1250, 64):
-            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-            wall.center_x = 968
-            wall.center_y = y
-            self.scene.add_sprite("Walls", wall)
-        for y in range(0, 1250, 64):
-            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-            wall.center_x = 32
-            wall.center_y = y
-            self.scene.add_sprite("Walls", wall)
-
-        """
-        # Put some crates on the ground
-        # This shows using a coordinate list to place sprites
-        coordinate_list = [[512, 96], [256, 96], [768, 96]]
-
-        for coordinate in coordinate_list:
-            # Add a crate on the ground
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
-            wall.position = coordinate
-            self.scene.add_sprite("Walls", wall)
-         """
+        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite, self.scene.get_sprite_list("Walls")
+            self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS)
         )
 
     def on_draw(self):
