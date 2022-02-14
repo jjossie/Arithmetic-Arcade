@@ -13,7 +13,8 @@ CHARACTER_SCALING = 0.75
 TILE_SCALING = 1
 
 MAPS = [
-    "maps/joel-demo.tmx"
+    # "maps/joel-demo.tmx",
+    "maps/Main-Spawn.tmx"
 ]
 
 PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
@@ -78,7 +79,7 @@ class MyGame(arcade.Window):
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS)
+            self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS),
         )
 
     def on_draw(self):
