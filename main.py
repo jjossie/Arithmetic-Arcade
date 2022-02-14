@@ -4,6 +4,7 @@ import arcade
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 750
 SCREEN_TITLE = "RUNTIME TERROR"
+MAP = ""
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
@@ -23,6 +24,8 @@ LAYER_NAME_WALLS = "walls"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_PLAYER = "player"
 
+PLAYER_TEXTURES = []
+
 
 class MyGame(arcade.Window):
     """
@@ -36,6 +39,12 @@ class MyGame(arcade.Window):
 
         # Our scene object
         self.scene = None
+
+        # Load Textures
+        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_02.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_05.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_20.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_11.png"))
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -72,11 +81,26 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
 
         # Set up the player, specifically placing it at these coordinates.
-        self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
+
+        self.player_sprite = arcade.Sprite("assets\kenney_sokobanpack\PNG\Default size\Player\player_05.png", CHARACTER_SCALING)
         self.player_sprite.center_x = 500
         self.player_sprite.center_y = 375
-        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
+        # self.player_list.append(self.player_sprite)
+        self.scene.add_sprite("Player", self.player_sprite)
 
+
+        # Create the ground
+        # This shows using a loop to place multiple sprites horizontally
+        for x in range(0, 1250, 64):
+            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
+            wall.center_x = x
+            wall.center_y = 32
+            self.scene.add_sprite("Walls", wall)
+            
+        # self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
+        # self.player_sprite.center_x = 500
+        # self.player_sprite.center_y = 375
+        # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
             self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS),
@@ -109,32 +133,32 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
 
-        if key == arcade.key.UP:
+        if key == arcade.key.UP or key == arcade.key.W:
             self.up_pressed = True
             self.update_player_speed()
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.DOWN or key == arcade.key.S:
             self.down_pressed = True
             self.update_player_speed()
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.LEFT or key == arcade.key.A:
             self.left_pressed = True
             self.update_player_speed()
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = True
             self.update_player_speed()
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
 
-        if key == arcade.key.UP:
+        if key == arcade.key.UP or key == arcade.key.W:
             self.up_pressed = False
             self.update_player_speed()
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.DOWN or key == arcade.key.S:
             self.down_pressed = False
             self.update_player_speed()
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.LEFT or key == arcade.key.A:
             self.left_pressed = False
             self.update_player_speed()
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
             self.update_player_speed()
 
@@ -143,6 +167,19 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+        self.texture_update()
+
+    def texture_update(self):
+        """Textures changed by directions"""
+
+        if self.up_pressed:
+            self.player_sprite.texture = PLAYER_TEXTURES[0]
+        if self.down_pressed:
+            self.player_sprite.texture = PLAYER_TEXTURES[1]
+        if self.left_pressed:
+            self.player_sprite.texture = PLAYER_TEXTURES[2]
+        if self.right_pressed:
+            self.player_sprite.texture = PLAYER_TEXTURES[3]
 
 
 def main():
