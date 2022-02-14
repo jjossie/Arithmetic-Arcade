@@ -95,13 +95,13 @@ class MyGame(arcade.Window):
         self.scene.add_sprite("Player", self.player_sprite)
 
 
-        # Create the ground
-        # This shows using a loop to place multiple sprites horizontally
-        for x in range(0, 1250, 64):
-            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 32
-            self.scene.add_sprite("Walls", wall)
+        # # Create the ground
+        # # This shows using a loop to place multiple sprites horizontally
+        # for x in range(0, 1250, 64):
+        #     wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
+        #     wall.center_x = x
+        #     wall.center_y = 32
+        #     self.scene.add_sprite("Walls", wall)
             
         # self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
         # self.player_sprite.center_x = 500
