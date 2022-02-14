@@ -45,10 +45,10 @@ class MyGame(arcade.Window):
         self.scene = None
 
         # Load Textures
-        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_02.png"))
-        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_05.png"))
-        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_20.png"))
-        PLAYER_TEXTURES.append(arcade.load_texture("assets\kenney_sokobanpack\PNG\Default size\Player\player_11.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_20.png"))
+        PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_11.png"))
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -88,7 +88,7 @@ class MyGame(arcade.Window):
 
         # Set up the player, specifically placing it at these coordinates.
 
-        self.player_sprite = arcade.Sprite("assets\kenney_sokobanpack\PNG\Default size\Player\player_05.png", CHARACTER_SCALING)
+        self.player_sprite = arcade.Sprite("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png", CHARACTER_SCALING)
         self.player_sprite.center_x = 500
         self.player_sprite.center_y = 375
         # self.player_list.append(self.player_sprite)
