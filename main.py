@@ -12,6 +12,7 @@ MAP = ""
 PLAYER_MOVEMENT_SPEED = 5
 
 CAMERA_SPEED = 0.1
+VIEWPORT_MARGIN = 200
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.75
@@ -66,6 +67,8 @@ class MyGame(arcade.Window):
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
 
         self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.view_bottom = 0
+        self.view_left = 0
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
@@ -193,9 +196,37 @@ class MyGame(arcade.Window):
 
     def scroll_to_player(self):
 
-        position = Vec2(self.player_sprite.center_x - self.width / 2,
-                        self.player_sprite.center_y - self.height / 2)
+         # --- Manage Scrolling ---
+
+        # Scroll left
+        left_boundary = self.view_left + VIEWPORT_MARGIN
+        if self.player_sprite.left < left_boundary:
+            self.view_left -= left_boundary - self.player_sprite.left
+
+        # Scroll right
+        right_boundary = self.view_left + self.width - VIEWPORT_MARGIN
+        if self.player_sprite.right > right_boundary:
+            self.view_left += self.player_sprite.right - right_boundary
+
+        # Scroll up
+        top_boundary = self.view_bottom + self.height - VIEWPORT_MARGIN
+        if self.player_sprite.top > top_boundary:
+            self.view_bottom += self.player_sprite.top - top_boundary
+
+        # Scroll down
+        bottom_boundary = self.view_bottom + VIEWPORT_MARGIN
+        if self.player_sprite.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
+
+        # Scroll to the proper location
+        position = self.view_left, self.view_bottom
         self.camera.move_to(position, CAMERA_SPEED)
+
+
+
+        # position = Vec2(self.player_sprite.center_x - self.width / 2,
+        #                 self.player_sprite.center_y - self.height / 2)
+        # self.camera.move_to(position, CAMERA_SPEED)
 
 
 def main():
