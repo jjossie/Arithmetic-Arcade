@@ -1,4 +1,6 @@
 import arcade
+from pyglet.math import Vec2
+
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -7,6 +9,8 @@ SCREEN_TITLE = "RUNTIME TERROR"
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
+
+CAMERA_SPEED = 0.1
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.75
@@ -51,6 +55,8 @@ class MyGame(arcade.Window):
         self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
 
+        self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
@@ -89,6 +95,8 @@ class MyGame(arcade.Window):
 
         # Draw our Scene
         self.scene.draw()
+
+        self.camera.use()
 
     def update_player_speed(self):
 
@@ -142,6 +150,14 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+
+        self.scroll_to_player()
+
+    def scroll_to_player(self):
+
+        position = Vec2(self.player_sprite.center_x - self.width / 2,
+                        self.player_sprite.center_y - self.height / 2)
+        self.camera.move_to(position, CAMERA_SPEED)
 
 
 def main():
