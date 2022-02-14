@@ -2,7 +2,7 @@ import arcade
 import random
 import operator
 
-NUMBER_LAYER_NAME = "Numbers"
+LAYER_NAME_NUMBER = "Numbers"
 
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
@@ -100,9 +100,9 @@ class VisualMathProblem:
         self.answer_sprite = NumberBlock(int(self.problem.answer))
 
     def draw(self):
-        self.scene.add_sprite(NUMBER_LAYER_NAME, self.lhs_sprite)
-        self.scene.add_sprite(NUMBER_LAYER_NAME, self.rhs_sprite)
-        self.scene.add_sprite(NUMBER_LAYER_NAME, self.answer_sprite)
+        self.scene.add_sprite(LAYER_NAME_NUMBER, self.lhs_sprite)
+        self.scene.add_sprite(LAYER_NAME_NUMBER, self.rhs_sprite)
+        self.scene.add_sprite(LAYER_NAME_NUMBER, self.answer_sprite)
 
         # Position the left number block
         self.lhs_sprite.center_x = self.center_x
