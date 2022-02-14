@@ -1,5 +1,5 @@
 import arcade
-from numbers_and_math import NumberBlock
+from numbers_and_math import NumberBlock, VisualMathProblem
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -25,7 +25,7 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
 
         # Our scene object
-        self.number1 = None
+        self.problem = None
         self.scene = None
 
         # Separate variable that holds the player sprite
@@ -60,10 +60,8 @@ class MyGame(arcade.Window):
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite("Player", self.player_sprite)
 
-        self.number1 = NumberBlock(4)
-        self.number1.center_x = 400
-        self.number1.center_y = 200
-        self.scene.add_sprite("Numbers", self.number1)
+        self.problem = VisualMathProblem(self.scene, 400, 300)
+        self.problem.draw()
 
         # Create the ground
         # This shows using a loop to place multiple sprites horizontally
