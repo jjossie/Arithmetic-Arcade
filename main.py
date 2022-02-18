@@ -1,6 +1,6 @@
 import arcade
+from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
 from pyglet.math import Vec2
-
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -44,6 +44,7 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
 
         # Our scene object
+        self.problem = None
         self.scene = None
 
         # Load Textures
@@ -92,28 +93,22 @@ class MyGame(arcade.Window):
 
         # Set up the player, specifically placing it at these coordinates.
 
-        self.player_sprite = arcade.Sprite("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png", CHARACTER_SCALING)
+        self.player_sprite = arcade.Sprite("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png",
+                                           CHARACTER_SCALING)
         self.player_sprite.center_x = 500
         self.player_sprite.center_y = 375
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite("Player", self.player_sprite)
 
+        self.problem = VisualMathProblem(self.scene, 400, 300)
+        self.problem.draw()
 
-        # # Create the ground
-        # # This shows using a loop to place multiple sprites horizontally
-        # for x in range(0, 1250, 64):
-        #     wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-        #     wall.center_x = x
-        #     wall.center_y = 32
-        #     self.scene.add_sprite("Walls", wall)
-            
-        # self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
-        # self.player_sprite.center_x = 500
-        # self.player_sprite.center_y = 375
-        # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS),
+            self.player_sprite, [
+                self.scene.get_sprite_list(LAYER_NAME_WALLS),
+                self.scene.get_sprite_list(LAYER_NAME_NUMBER)
+            ]
         )
 
     def on_draw(self):
@@ -126,6 +121,9 @@ class MyGame(arcade.Window):
         self.scene.draw()
 
         self.camera.use()
+
+        # Draw Math Layer
+        self.scene.get_sprite_list("Numbers").update_animation()
 
     def update_player_speed(self):
 
@@ -217,7 +215,7 @@ class MyGame(arcade.Window):
 
     def scroll_to_player(self):
 
-         # --- Manage Scrolling ---
+        # --- Manage Scrolling ---
 
         # Scroll left
         left_boundary = self.view_left + VIEWPORT_MARGIN
@@ -240,14 +238,8 @@ class MyGame(arcade.Window):
             self.view_bottom -= bottom_boundary - self.player_sprite.bottom
 
         # Scroll to the proper location
-        position = self.view_left, self.view_bottom
+        position = Vec2(self.view_left, self.view_bottom)
         self.camera.move_to(position, CAMERA_SPEED)
-
-
-
-        # position = Vec2(self.player_sprite.center_x - self.width / 2,
-        #                 self.player_sprite.center_y - self.height / 2)
-        # self.camera.move_to(position, CAMERA_SPEED)
 
 
 def main():
