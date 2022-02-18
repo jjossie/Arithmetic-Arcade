@@ -7,6 +7,7 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 750
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""
+MAP_SIZE = 1550
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
@@ -132,7 +133,9 @@ class MyGame(arcade.Window):
         self.player_sprite.change_x = 0
         self.player_sprite.change_y = 0
 
+        
         if self.up_pressed and not self.down_pressed:
+
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
         elif self.down_pressed and not self.up_pressed:
             self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
@@ -192,7 +195,24 @@ class MyGame(arcade.Window):
         if self.right_pressed:
             self.player_sprite.texture = PLAYER_TEXTURES[3]
 
-        self.scroll_to_player()
+        if self.player_sprite.center_x < (VIEWPORT_MARGIN*6/5):
+            if self.player_sprite.center_x <= (VIEWPORT_MARGIN/10):    
+                self.player_sprite.center_x = (VIEWPORT_MARGIN/10)
+        elif self.player_sprite.center_y < (VIEWPORT_MARGIN*1.2):
+            if self.player_sprite.center_y <= (VIEWPORT_MARGIN/10):    
+                self.player_sprite.center_y = (VIEWPORT_MARGIN/10)
+        elif self.player_sprite.center_x > (MAP_SIZE-VIEWPORT_MARGIN*0.8):
+            if self.player_sprite.center_x >= (MAP_SIZE+20):
+                self.player_sprite.center_x = (MAP_SIZE+20)
+        elif self.player_sprite.center_y > (MAP_SIZE - VIEWPORT_MARGIN*0.8):
+            if self.player_sprite.center_y >= (MAP_SIZE + VIEWPORT_MARGIN/5):
+                self.player_sprite.center_y = (MAP_SIZE + VIEWPORT_MARGIN/5)    
+        else:
+            self.scroll_to_player()
+            
+
+        
+        
 
     def scroll_to_player(self):
 
