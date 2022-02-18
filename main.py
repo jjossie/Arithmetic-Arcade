@@ -195,6 +195,7 @@ class MyGame(arcade.Window):
         if self.right_pressed:
             self.player_sprite.texture = PLAYER_TEXTURES[3]
 
+        # This does not allow the player go over
         if self.player_sprite.center_x < (VIEWPORT_MARGIN*6/5):
             if self.player_sprite.center_x <= (VIEWPORT_MARGIN/10):    
                 self.player_sprite.center_x = (VIEWPORT_MARGIN/10)
