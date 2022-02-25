@@ -1,6 +1,8 @@
 import arcade
-from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
+from matplotlib.pyplot import show
+from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER, Caption
 from pyglet.math import Vec2
+from math import sqrt
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -72,7 +74,11 @@ class MyGame(arcade.Window):
         self.view_bottom = 0
         self.view_left = 0
 
+        # A Camera that can be used to draw GUI elements
+        self.gui_camera = None
+
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
+
 
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
@@ -111,6 +117,7 @@ class MyGame(arcade.Window):
             ]
         )
 
+
     def on_draw(self):
         """Render the screen."""
 
@@ -124,6 +131,10 @@ class MyGame(arcade.Window):
 
         # Draw Math Layer
         self.scene.get_sprite_list("Numbers").update_animation()
+
+        
+        self.caption()
+
 
     def update_player_speed(self):
 
@@ -142,6 +153,7 @@ class MyGame(arcade.Window):
         elif self.right_pressed and not self.left_pressed:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
+
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
 
@@ -157,6 +169,7 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = True
             self.update_player_speed()
+
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -174,12 +187,16 @@ class MyGame(arcade.Window):
             self.right_pressed = False
             self.update_player_speed()
 
+
     def on_update(self, delta_time):
+        
         """Movement and game logic"""
 
         # Move the player with the physics engine
         self.physics_engine.update()
         self.texture_update()
+        self.caption()
+
 
     def texture_update(self):
         """Textures changed by directions"""
@@ -208,11 +225,40 @@ class MyGame(arcade.Window):
                 self.player_sprite.center_y = (MAP_SIZE + VIEWPORT_MARGIN/5)    
         else:
             self.scroll_to_player()
-            
 
-        
-        
 
+    def caption(self):
+        """This Function is to display the caption when it touches the boxes"""
+
+        show_caption = False
+        cap = "Press Space to lift it up"
+        
+        left_distance = sqrt((self.problem.lhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.lhs_sprite.center_y-self.player_sprite.center_y)**2)
+        right_distance = sqrt((self.problem.rhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.rhs_sprite.center_y-self.player_sprite.center_y)**2)
+
+        if left_distance < 55: 
+            show_caption = True 
+        elif right_distance < 55:
+            show_caption = True 
+        else: 
+            show_caption = False
+
+        if show_caption:
+            arcade.draw_text(
+            cap,
+            self.view_left + SCREEN_WIDTH*0.3,
+            self.view_bottom + SCREEN_HEIGHT*0.8,
+            arcade.csscolor.WHITE,
+            30,)
+        else:
+            arcade.draw_text(
+            " ",
+            0,
+            0,
+            arcade.csscolor.WHITE,
+            18,)
+     
+        
     def scroll_to_player(self):
 
         # --- Manage Scrolling ---
