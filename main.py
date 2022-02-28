@@ -1,6 +1,6 @@
 import arcade
 from matplotlib.pyplot import show
-from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER, Caption
+from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
 from pyglet.math import Vec2
 from math import sqrt
 
