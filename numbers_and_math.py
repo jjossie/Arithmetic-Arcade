@@ -13,6 +13,7 @@ class NumberBlock(arcade.Sprite):
     """
     A sprite that draws itself as a crate with its stored value as a number on top.
     """
+
     def __init__(self, value=0):
         super().__init__()
         self.value = value
@@ -37,12 +38,33 @@ class NumberBlock(arcade.Sprite):
         )
 
 
+class NumberBlockGroup:
+    """
+    One or more (probably up to 3) NumberBlocks that represent a single value.
+    """
+
+    def __init__(self, blocks):
+        self.blocks = blocks
+        self.value = self._compute_value()
+
+    def _compute_value(self):
+        block_count = len(self.blocks)
+        value = 0
+        multiplier = 1
+        for block in reversed(self.blocks):
+            # print(f"i: {i}, multiplier: {multiplier}, block[i]: {self.blocks[i].value}")
+            value += block.value * multiplier
+            multiplier *= 10
+        return value
+
+
 class SimpleMathProblem:
     """
     Represents a math problem consisting of two operands - lhs and rhs (left-hand side
     and right-hand side) - an operation to be performed on them, and the result of the
     operation.
     """
+
     def __init__(self, min_value=1, max_value=10):
         self.operators = {
             "+": operator.add,
