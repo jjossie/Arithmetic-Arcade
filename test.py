@@ -28,6 +28,21 @@ class TestNumberBlockGroup(unittest.TestCase):
         group = NumberBlockGroup([block_one, block_two, block_three])
         self.assertEqual(group.value, 159)
 
+    def test_place_left(self):
+        block_one = NumberBlock(1)
+        block_two = NumberBlock(5)
+        group = NumberBlockGroup([block_one, block_two])
+        group.place_left(NumberBlock(3))
+        self.assertEqual(len(group._blocks), 3)
+        self.assertEqual(group.value, 315)
+
+    def test_place_right(self):
+        block_one = NumberBlock(1)
+        block_two = NumberBlock(5)
+        group = NumberBlockGroup([block_one, block_two])
+        group.place_right(NumberBlock(3))
+        self.assertEqual(len(group._blocks), 3)
+        self.assertEqual(group.value, 153)
 
 if __name__ == '__main__':
     unittest.main()

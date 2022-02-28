@@ -43,19 +43,28 @@ class NumberBlockGroup:
     One or more (probably up to 3) NumberBlocks that represent a single value.
     """
 
-    def __init__(self, blocks):
-        self.blocks = blocks
+    def __init__(self, blocks=[]):
+        self._blocks = blocks
         self.value = self._compute_value()
 
     def _compute_value(self):
-        block_count = len(self.blocks)
         value = 0
         multiplier = 1
-        for block in reversed(self.blocks):
-            # print(f"i: {i}, multiplier: {multiplier}, block[i]: {self.blocks[i].value}")
+        for block in reversed(self._blocks):
             value += block.value * multiplier
             multiplier *= 10
         return value
+
+    def place_left(self, number_block):
+        self._blocks.insert(0, number_block)
+        self.update_value()
+
+    def place_right(self, number_block):
+        self._blocks.append(number_block)
+        self.update_value()
+
+    def update_value(self):
+        self.value = self._compute_value()
 
 
 class SimpleMathProblem:
