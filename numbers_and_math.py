@@ -1,12 +1,11 @@
+import imp
 import arcade
 import random
 import operator
 
-LAYER_NAME_NUMBER = "Numbers"
+from constant import *
 
-CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
-CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
-TILE_SIZE = 32
+
 
 
 class NumberBlock(arcade.Sprite):
