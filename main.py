@@ -12,13 +12,13 @@ MAP = ""
 MAP_SIZE = 1550
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5
+PLAYER_MOVEMENT_SPEED = 8
 
 CAMERA_SPEED = 0.1
 VIEWPORT_MARGIN = 200
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.75
+CHARACTER_SCALING = 1
 TILE_SCALING = 1
 
 MAPS = [
@@ -106,6 +106,8 @@ class MyGame(arcade.Window):
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite("Player", self.player_sprite)
 
+        # Make a test math problem
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.problem = VisualMathProblem(self.scene, 400, 300)
         self.problem.draw()
 
@@ -232,15 +234,15 @@ class MyGame(arcade.Window):
 
         show_caption = False
         cap = "Press Space to lift it up"
-        
-        left_distance = sqrt((self.problem.lhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.lhs_sprite.center_y-self.player_sprite.center_y)**2)
-        right_distance = sqrt((self.problem.rhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.rhs_sprite.center_y-self.player_sprite.center_y)**2)
 
-        if left_distance < 55: 
-            show_caption = True 
+        left_distance = sqrt((self.problem.lhs.center_x - self.player_sprite.center_x) ** 2 + (self.problem.lhs.center_y - self.player_sprite.center_y) ** 2)
+        right_distance = sqrt((self.problem.rhs.center_x - self.player_sprite.center_x) ** 2 + (self.problem.rhs.center_y - self.player_sprite.center_y) ** 2)
+
+        if left_distance < 55:
+            show_caption = True
         elif right_distance < 55:
-            show_caption = True 
-        else: 
+            show_caption = True
+        else:
             show_caption = False
 
         if show_caption:

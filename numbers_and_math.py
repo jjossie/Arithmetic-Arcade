@@ -2,6 +2,8 @@ import arcade
 import random
 import operator
 
+TILE_SCALING = 1
+
 LAYER_NAME_NUMBER = "Numbers"
 
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
@@ -18,7 +20,7 @@ class NumberBlock(arcade.Sprite):
         super().__init__()
         self.value = value
         self.texture = arcade.load_texture(CRATE_BLUE_PATH)
-        print(f"NumberBlock created with value {self.value}")
+        self.scale = TILE_SCALING
         self.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
@@ -28,7 +30,7 @@ class NumberBlock(arcade.Sprite):
             start_x=self.center_x,
             start_y=self.center_y,
             color=arcade.color.WHITE,
-            font_size=18,
+            font_size=18 * TILE_SCALING,
             width=int(self.width),
             align="center",
             font_name="calibri",
@@ -43,9 +45,16 @@ class NumberBlockGroup:
     One or more (probably up to 3) NumberBlocks that represent a single value.
     """
 
-    def __init__(self, blocks=[]):
-        self._blocks = blocks
-        self.value = self._compute_value()
+    def __init__(self, x=0, y=0, blocks=None, from_number=None):
+        if from_number is None:
+            self._blocks = blocks
+            self.value = self._compute_value()
+        else:
+            assert (blocks is None)
+            self.value = from_number
+            self._blocks = self._make_blocks_from_number()
+        self.x = x
+        self.y = y
 
     def _compute_value(self):
         value = 0
@@ -55,16 +64,36 @@ class NumberBlockGroup:
             multiplier *= 10
         return value
 
+    def _make_blocks_from_number(self):
+        finished = False
+        multiplier = 1
+        temp_val = self.value
+        blocks = []
+        while not finished:
+            single_digit = ((temp_val % (multiplier * 10)) - (temp_val % multiplier)) / multiplier
+            blocks.insert(0, NumberBlock(single_digit))
+            multiplier *= 10
+            if temp_val // multiplier == 0:
+                finished = True
+
+        return blocks
+
     def place_left(self, number_block):
         self._blocks.insert(0, number_block)
-        self.update_value()
+        self._update_value()
 
     def place_right(self, number_block):
         self._blocks.append(number_block)
-        self.update_value()
+        self._update_value()
 
-    def update_value(self):
+    def _update_value(self):
         self.value = self._compute_value()
+
+    def draw(self, sprite_list):
+        for index, block in enumerate(self._blocks):
+            block.register_sprite_list(sprite_list)  # TODO not sure what's going wrong here
+            block.center_x = self.x + (TILE_SIZE * (index + 1))
+            block.center_y = self.y
 
 
 class SimpleMathProblem:
@@ -125,24 +154,28 @@ class VisualMathProblem:
         self.center_y = center_y
 
         self.problem = get_clean_problem()
-        self.lhs_sprite = NumberBlock(self.problem.lhs)
-        self.rhs_sprite = NumberBlock(self.problem.rhs)
-        # self.operator_sprite = NumberBlock(self.problem.operator)
-        self.answer_sprite = NumberBlock(int(self.problem.answer))
+        self.lhs = NumberBlockGroup(self.center_x, self.center_y, from_number=self.problem.lhs)
+        self.rhs = NumberBlockGroup(self.center_x + (4 * TILE_SIZE), self.center_y, from_number=self.problem.rhs)
+        self.answer = NumberBlockGroup(self.center_x + (8 * TILE_SIZE), self.center_y,
+                                       from_number=int(self.problem.answer))
 
     def draw(self):
-        self.scene.add_sprite(LAYER_NAME_NUMBER, self.lhs_sprite)
-        self.scene.add_sprite(LAYER_NAME_NUMBER, self.rhs_sprite)
-        self.scene.add_sprite(LAYER_NAME_NUMBER, self.answer_sprite)
+        sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
+        # self.scene.add_sprite(LAYER_NAME_NUMBER, self.lhs_sprite)
+        self.lhs.draw(sprite_list)
+        # self.scene.add_sprite(LAYER_NAME_NUMBER, self.rhs_sprite)
+        self.rhs.draw(sprite_list)
+        # self.scene.add_sprite(LAYER_NAME_NUMBER, self.answer_sprite)
+        self.answer.draw(sprite_list)
 
         # Position the left number block
-        self.lhs_sprite.center_x = self.center_x
-        self.lhs_sprite.center_y = self.center_y
+        self.lhs.center_x = self.center_x
+        self.lhs.center_y = self.center_y
 
         # Position the right number block
-        self.rhs_sprite.center_x = self.center_x + (4 * TILE_SIZE)
-        self.rhs_sprite.center_y = self.center_y
+        self.rhs.center_x = self.center_x + (4 * TILE_SIZE)
+        self.rhs.center_y = self.center_y
 
         # Position the answer number block
-        self.answer_sprite.center_x = self.center_x + (8 * TILE_SIZE)
-        self.answer_sprite.center_y = self.center_y
+        self.answer.center_x = self.center_x + (8 * TILE_SIZE)
+        self.answer.center_y = self.center_y
