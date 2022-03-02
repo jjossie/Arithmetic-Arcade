@@ -1,12 +1,15 @@
 import arcade
+from matplotlib.pyplot import show
+from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
 from pyglet.math import Vec2
-
+from math import sqrt
 
 # Constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 750
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""
+MAP_SIZE = 1550
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
@@ -47,6 +50,7 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
 
         # Our scene object
+        self.problem = None
         self.scene = None
 
         # Load Textures
@@ -74,7 +78,11 @@ class MyGame(arcade.Window):
         self.view_bottom = 0
         self.view_left = 0
 
+        # A Camera that can be used to draw GUI elements
+        self.gui_camera = None
+
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
+
 
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
@@ -110,25 +118,17 @@ class MyGame(arcade.Window):
         #self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
 
 
+        self.problem = VisualMathProblem(self.scene, 400, 300)
+        self.problem.draw()
 
-        # # Create the ground
-        # # This shows using a loop to place multiple sprites horizontally
-        # for x in range(0, 1250, 64):
-        #     wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", TILE_SCALING)
-        #     wall.center_x = x
-        #     wall.center_y = 32
-        #     self.scene.add_sprite("Walls", wall)
-            
-        # self.player_sprite = arcade.Sprite(PLAYER_IMAGE_PATH, CHARACTER_SCALING)
-        # self.player_sprite.center_x = 500
-        # self.player_sprite.center_y = 375
-        # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS),
+            self.player_sprite, [
+                self.scene.get_sprite_list(LAYER_NAME_WALLS),
+                self.scene.get_sprite_list(LAYER_NAME_NUMBER)
+            ]
         )
 
-    #def load_new_level(self):
 
     def on_draw(self):
         """Render the screen."""
@@ -140,6 +140,13 @@ class MyGame(arcade.Window):
         self.scene.draw()
 
         self.camera.use()
+
+        # Draw Math Layer
+        self.scene.get_sprite_list("Numbers").update_animation()
+
+
+        self.caption()
+
 
     def update_player_speed(self):
 
@@ -194,13 +201,8 @@ class MyGame(arcade.Window):
         # Move the player with the physics engine
         self.physics_engine.update()
         self.texture_update()
-        #if self.player_sprite.center_x >= self.end_of_map:
-         #   self.level += 1
+        self.caption()
 
-          #  self.setup(self.level)
-           # self.view_left = 0
-            #self.view_bottom = 0 
-            #changed_viewport = True
 
     def texture_update(self):
         """Textures changed by directions"""
@@ -214,11 +216,58 @@ class MyGame(arcade.Window):
         if self.right_pressed:
             self.player_sprite.texture = PLAYER_TEXTURES[3]
 
-        self.scroll_to_player()
+        # This does not allow the player go over
+        if self.player_sprite.center_x < (VIEWPORT_MARGIN*6/5):
+            if self.player_sprite.center_x <= (VIEWPORT_MARGIN/10):
+                self.player_sprite.center_x = (VIEWPORT_MARGIN/10)
+        elif self.player_sprite.center_y < (VIEWPORT_MARGIN*1.2):
+            if self.player_sprite.center_y <= (VIEWPORT_MARGIN/10):
+                self.player_sprite.center_y = (VIEWPORT_MARGIN/10)
+        elif self.player_sprite.center_x > (MAP_SIZE-VIEWPORT_MARGIN*0.8):
+            if self.player_sprite.center_x >= (MAP_SIZE+20):
+                self.player_sprite.center_x = (MAP_SIZE+20)
+        elif self.player_sprite.center_y > (MAP_SIZE - VIEWPORT_MARGIN*0.8):
+            if self.player_sprite.center_y >= (MAP_SIZE + VIEWPORT_MARGIN/5):
+                self.player_sprite.center_y = (MAP_SIZE + VIEWPORT_MARGIN/5)
+        else:
+            self.scroll_to_player()
+
+
+    def caption(self):
+        """This Function is to display the caption when it touches the boxes"""
+
+        show_caption = False
+        cap = "Press Space to lift it up"
+
+        left_distance = sqrt((self.problem.lhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.lhs_sprite.center_y-self.player_sprite.center_y)**2)
+        right_distance = sqrt((self.problem.rhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.rhs_sprite.center_y-self.player_sprite.center_y)**2)
+
+        if left_distance < 55:
+            show_caption = True
+        elif right_distance < 55:
+            show_caption = True
+        else:
+            show_caption = False
+
+        if show_caption:
+            arcade.draw_text(
+            cap,
+            self.view_left + SCREEN_WIDTH*0.3,
+            self.view_bottom + SCREEN_HEIGHT*0.8,
+            arcade.csscolor.WHITE,
+            30,)
+        else:
+            arcade.draw_text(
+            " ",
+            0,
+            0,
+            arcade.csscolor.WHITE,
+            18,)
+
 
     def scroll_to_player(self):
 
-         # --- Manage Scrolling ---
+        # --- Manage Scrolling ---
 
         # Scroll left
         left_boundary = self.view_left + VIEWPORT_MARGIN
@@ -241,14 +290,8 @@ class MyGame(arcade.Window):
             self.view_bottom -= bottom_boundary - self.player_sprite.bottom
 
         # Scroll to the proper location
-        position = self.view_left, self.view_bottom
+        position = Vec2(self.view_left, self.view_bottom)
         self.camera.move_to(position, CAMERA_SPEED)
-
-
-
-        # position = Vec2(self.player_sprite.center_x - self.width / 2,
-        #                 self.player_sprite.center_y - self.height / 2)
-        # self.camera.move_to(position, CAMERA_SPEED)
 
 
 def main():
