@@ -66,8 +66,21 @@ class MyGame(arcade.Window):
 
         # Make a test math problem
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
-        self.problem = VisualMathProblem(self.scene, 400, 300)
+        # self.problems.append(VisualMathProblem(self.scene, 400, 300, 1, 10))
+        # self.problems.append(VisualMathProblem(self.scene, 400, 400, 5, 15))
+        # self.problems.append(VisualMathProblem(self.scene, 400, 500, 10, 20))
+        # self.problems.append(VisualMathProblem(self.scene, 400, 600, 10, 30))
+        # for problem in self.problems:
+        #     problem.draw()
+
+        self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
+        problem2 = VisualMathProblem(self.scene, 400, 500, 5, 15)
+        problem3 = VisualMathProblem(self.scene, 400, 700, 10, 20)
+        problem4 = VisualMathProblem(self.scene, 400, 900, 10, 30)
         self.problem.draw()
+        problem2.draw()
+        problem3.draw()
+        problem4.draw()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(

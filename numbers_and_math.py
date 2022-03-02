@@ -160,7 +160,7 @@ class SimpleMathProblem:
         return answer
 
 
-def get_clean_problem():
+def get_clean_problem(min=None, max=None):
     """
     Quick and Dirty method for getting a nice and pretty math problem; i.e., one
     where the answer comes out to an integer, not a decimal.
@@ -168,7 +168,7 @@ def get_clean_problem():
     prob = None
     valid = False
     while not valid:
-        prob = SimpleMathProblem()
+        prob = SimpleMathProblem(min, max)
         if isinstance(prob.answer, int):
             valid = True
         elif isinstance(prob.answer, float) and prob.answer.is_integer():
@@ -183,12 +183,12 @@ class VisualMathProblem:
     the result are all represented.
     """
 
-    def __init__(self, scene, center_x=0, center_y=0):
+    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None):
         self.scene = scene
         self.center_x = center_x
         self.center_y = center_y
 
-        self.problem = get_clean_problem()
+        self.problem = get_clean_problem(min, max)
         self.lhs = NumberBlockGroup(self.center_x, self.center_y, from_number=self.problem.lhs)
         self.rhs = NumberBlockGroup(self.center_x + (4 * TILE_SIZE), self.center_y, from_number=self.problem.rhs)
         self.answer = NumberBlockGroup(self.center_x + (8 * TILE_SIZE), self.center_y,
@@ -208,7 +208,7 @@ class VisualMathProblem:
 
         x = self.center_x
         y = self.center_y
-        space = TILE_SIZE * TILE_SCALING
+        space = TILE_SIZE * TILE_SCALING * 2
         for chunk in self.draw_order:
             size = 1
             if isinstance(chunk, NumberBlockGroup):
