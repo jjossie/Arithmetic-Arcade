@@ -6,8 +6,6 @@ import operator
 from constant import *
 
 
-
-
 class NumberBlock(arcade.Sprite):
     """
     A sprite that draws itself as a crate with its stored value as a number on top.
