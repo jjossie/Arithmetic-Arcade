@@ -21,7 +21,7 @@ class NumberBlock(arcade.Sprite):
         self.value = value
         self.texture = arcade.load_texture(CRATE_BLUE_PATH)
         self.scale = TILE_SCALING
-        self.draw()
+        # self.draw()
 
     def update_animation(self, delta_time: float = 1 / 60):
         # Draw this block's numeric value on top of this sprite.
@@ -51,7 +51,7 @@ class NumberBlockGroup:
             self.value = self._compute_value()
         else:
             assert (blocks is None)
-            self.value = from_number
+            self.value = int(from_number)
             self._blocks = self._make_blocks_from_number()
         self.x = x
         self.y = y
@@ -70,7 +70,7 @@ class NumberBlockGroup:
         temp_val = self.value
         blocks = []
         while not finished:
-            single_digit = ((temp_val % (multiplier * 10)) - (temp_val % multiplier)) / multiplier
+            single_digit = int(((temp_val % (multiplier * 10)) - (temp_val % multiplier)) / multiplier)
             blocks.insert(0, NumberBlock(single_digit))
             multiplier *= 10
             if temp_val // multiplier == 0:
@@ -91,8 +91,8 @@ class NumberBlockGroup:
 
     def draw(self, sprite_list):
         for index, block in enumerate(self._blocks):
-            block.register_sprite_list(sprite_list)  # TODO not sure what's going wrong here
-            block.center_x = self.x + (TILE_SIZE * (index + 1))
+            sprite_list.append(block)
+            block.center_x = self.x + (TILE_SIZE * (index + 1) * 2) * TILE_SCALING
             block.center_y = self.y
 
 
@@ -158,23 +158,32 @@ class VisualMathProblem:
         self.rhs = NumberBlockGroup(self.center_x + (4 * TILE_SIZE), self.center_y, from_number=self.problem.rhs)
         self.answer = NumberBlockGroup(self.center_x + (8 * TILE_SIZE), self.center_y,
                                        from_number=int(self.problem.answer))
+        self.equals = NumberBlock("=")
+        self.operator = NumberBlock(str(self.problem.operator))
 
     def draw(self):
         sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
-        # self.scene.add_sprite(LAYER_NAME_NUMBER, self.lhs_sprite)
         self.lhs.draw(sprite_list)
-        # self.scene.add_sprite(LAYER_NAME_NUMBER, self.rhs_sprite)
         self.rhs.draw(sprite_list)
-        # self.scene.add_sprite(LAYER_NAME_NUMBER, self.answer_sprite)
         self.answer.draw(sprite_list)
+        sprite_list.append(self.equals)
+        sprite_list.append(self.operator)
 
         # Position the left number block
         self.lhs.center_x = self.center_x
         self.lhs.center_y = self.center_y
 
+        # Position the operator
+        self.operator.center_x = self.center_x + (12 * TILE_SIZE)
+        self.operator.center_y = self.center_y
+
         # Position the right number block
         self.rhs.center_x = self.center_x + (4 * TILE_SIZE)
         self.rhs.center_y = self.center_y
+
+        # Position the equals sign
+        self.equals.center_x = self.center_x + (16 * TILE_SIZE)
+        self.equals.center_y = self.center_y
 
         # Position the answer number block
         self.answer.center_x = self.center_x + (8 * TILE_SIZE)
