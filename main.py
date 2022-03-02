@@ -99,6 +99,7 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+        self.player.update_player_speed()
         self.player.texture_update()
         self.caption()
 
@@ -114,10 +115,10 @@ class MyGame(arcade.Window):
         show_caption = False
         cap = "Press Space to lift it up"
 
-        left_distance = sqrt((self.problem.lhs_sprite.center_x - self.player.center_x) ** 2 + (
-                    self.problem.lhs_sprite.center_y - self.player.center_y) ** 2)
-        right_distance = sqrt((self.problem.rhs_sprite.center_x - self.player.center_x) ** 2 + (
-                    self.problem.rhs_sprite.center_y - self.player.center_y) ** 2)
+        left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
+                    self.problem.lhs.center_y - self.player.center_y) ** 2)
+        right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
+                    self.problem.rhs.center_y - self.player.center_y) ** 2)
 
         if left_distance < 55:
             show_caption = True
