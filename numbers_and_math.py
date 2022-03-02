@@ -3,6 +3,8 @@ import arcade
 import random
 import operator
 
+from numpy import isin
+
 from constant import *
 
 
@@ -34,6 +36,14 @@ class NumberBlock(arcade.Sprite):
             anchor_y="center",
         )
 
+    def move_to(self, x, y):
+        """
+        This only exists for the purpose of polymorphism - to be synonymous with NumberBlockGroup,
+        which has the same function.
+        """
+        self.center_x = x
+        self.center_y = y
+
 
 class NumberBlockGroup:
     """
@@ -48,8 +58,9 @@ class NumberBlockGroup:
             assert (blocks is None)
             self.value = int(from_number)
             self._blocks = self._make_blocks_from_number()
-        self.x = x
-        self.y = y
+        self.center_x = x
+        self.center_y = y
+        self.sprite_list = None
 
     def _compute_value(self):
         value = 0
@@ -84,11 +95,40 @@ class NumberBlockGroup:
     def _update_value(self):
         self.value = self._compute_value()
 
-    def draw(self, sprite_list):
+    def draw(self, sprite_list=None):
+        """
+        Just to clarify, this is not overriding a built-in arcade draw() function.
+        It just tells each NumberBlock in the list where to place itself and which texture to use.
+        """
+        # Checks to ensure we already have a sprite_list for this object.
+        if sprite_list is None:
+            assert(self.sprite_list is not None)
+        # Stores a sprite_list into this object the first time it's called.
+        else:
+            self.sprite_list = sprite_list
+
+        for block in self._blocks:
+            self.sprite_list.append(block)
+
+    def _update_locations(self):
         for index, block in enumerate(self._blocks):
-            sprite_list.append(block)
-            block.center_x = self.x + (TILE_SIZE * (index + 1) * 2) * TILE_SCALING
-            block.center_y = self.y
+            offset =  index * TILE_SIZE * TILE_SCALING * 2
+            block.center_x = self.center_x + offset
+            block.center_y = self.center_y
+            print(f"block {block.value}: ({block.center_x}, {block.center_y}) - offset: {offset}")
+
+    def move_to(self, x, y):
+        """
+        Use this when trying to move the block group rather than editing center_x
+        and center_y directly. This ensures the child blocks get moved along properly
+        as well.
+        """
+        self.center_x = x
+        self.center_y = y
+        self._update_locations()
+
+    def get_size(self):
+        return len(self._blocks)
 
 
 class SimpleMathProblem:
@@ -156,6 +196,8 @@ class VisualMathProblem:
         self.equals = NumberBlock("=")
         self.operator = NumberBlock(str(self.problem.operator))
 
+        self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer]
+
     def draw(self):
         sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
         self.lhs.draw(sprite_list)
@@ -164,22 +206,16 @@ class VisualMathProblem:
         sprite_list.append(self.equals)
         sprite_list.append(self.operator)
 
-        # Position the left number block
-        self.lhs.center_x = self.center_x
-        self.lhs.center_y = self.center_y
+        x = self.center_x
+        y = self.center_y
+        space = TILE_SIZE * TILE_SCALING
+        for chunk in self.draw_order:
+            size = 1
+            if isinstance(chunk, NumberBlockGroup):
+                size = chunk.get_size()
+            chunk.move_to(x, y)
 
-        # Position the operator
-        self.operator.center_x = self.center_x + (12 * TILE_SIZE)
-        self.operator.center_y = self.center_y
+            # Move over to the next space
+            x += space * size + space
 
-        # Position the right number block
-        self.rhs.center_x = self.center_x + (4 * TILE_SIZE)
-        self.rhs.center_y = self.center_y
-
-        # Position the equals sign
-        self.equals.center_x = self.center_x + (16 * TILE_SIZE)
-        self.equals.center_y = self.center_y
-
-        # Position the answer number block
-        self.answer.center_x = self.center_x + (8 * TILE_SIZE)
-        self.answer.center_y = self.center_y
+            print(f"chunk {chunk.value}: ({chunk.center_x}, {chunk.center_y})")
