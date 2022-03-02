@@ -25,12 +25,9 @@ PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerso
 LAYER_NAME_WALLS = "walls"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_PLAYER = "player"
+LAYER_NAME_NUMBER = "Numbers"
 
 PLAYER_TEXTURES = []
-
-
-
-LAYER_NAME_NUMBER = "Numbers"
 
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"

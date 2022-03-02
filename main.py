@@ -6,6 +6,7 @@ from math import sqrt
 from constant import *
 from player import Player
 
+
 class MyGame(arcade.Window):
     """
     Main application class.
@@ -27,7 +28,6 @@ class MyGame(arcade.Window):
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_20.png"))
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_11.png"))
 
-
         # Our physics engine
         self.physics_engine = None
 
@@ -43,7 +43,6 @@ class MyGame(arcade.Window):
         self.gui_camera = None
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
-
 
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
@@ -62,10 +61,8 @@ class MyGame(arcade.Window):
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
 
-        
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
-        
 
         self.problem = VisualMathProblem(self.scene, 400, 300)
         self.problem.draw()
@@ -77,7 +74,6 @@ class MyGame(arcade.Window):
                 self.scene.get_sprite_list(LAYER_NAME_NUMBER)
             ]
         )
-
 
     def on_draw(self):
         """Render the screen."""
@@ -93,12 +89,10 @@ class MyGame(arcade.Window):
         # Draw Math Layer
         self.scene.get_sprite_list("Numbers").update_animation()
 
-        
         self.caption()
 
-
     def on_update(self, delta_time):
-        
+
         """Movement and game logic"""
 
         # Move the player with the physics engine
@@ -106,51 +100,47 @@ class MyGame(arcade.Window):
         self.player.texture_update()
         self.caption()
 
-
-
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
 
-
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
-
-
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
         show_caption = False
         cap = "Press Space to lift it up"
-        
-        left_distance = sqrt((self.problem.lhs_sprite.center_x-self.player.center_x)**2+(self.problem.lhs_sprite.center_y-self.player.center_y)**2)
-        right_distance = sqrt((self.problem.rhs_sprite.center_x-self.player.center_x)**2+(self.problem.rhs_sprite.center_y-self.player.center_y)**2)
 
-        if left_distance < 55: 
-            show_caption = True 
+        left_distance = sqrt((self.problem.lhs_sprite.center_x - self.player.center_x) ** 2 + (
+                    self.problem.lhs_sprite.center_y - self.player.center_y) ** 2)
+        right_distance = sqrt((self.problem.rhs_sprite.center_x - self.player.center_x) ** 2 + (
+                    self.problem.rhs_sprite.center_y - self.player.center_y) ** 2)
+
+        if left_distance < 55:
+            show_caption = True
         elif right_distance < 55:
-            show_caption = True 
-        else: 
+            show_caption = True
+        else:
             show_caption = False
 
         if show_caption:
             arcade.draw_text(
-            cap,
-            self.view_left + SCREEN_WIDTH*0.3,
-            self.view_bottom + SCREEN_HEIGHT*0.8,
-            arcade.csscolor.WHITE,
-            30,)
+                cap,
+                self.view_left + SCREEN_WIDTH * 0.3,
+                self.view_bottom + SCREEN_HEIGHT * 0.8,
+                arcade.csscolor.WHITE,
+                30, )
         else:
             arcade.draw_text(
-            " ",
-            0,
-            0,
-            arcade.csscolor.WHITE,
-            18,)
-     
-        
+                " ",
+                0,
+                0,
+                arcade.csscolor.WHITE,
+                18, )
+
     def scroll_to_player(self):
-    
+
         # --- Manage Scrolling ---
 
         # Scroll left
