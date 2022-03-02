@@ -20,7 +20,11 @@ TILE_SCALING = 1
 
 MAPS = [
     # "maps/joel-demo.tmx",
-    "maps/Main-Spawn.tmx"
+    # "maps/Main-Spawn.tmx"
+     "maps/Urban-Area.tmx"
+    # "maps/Castle-Area.tmx"
+    # "maps/Desert-Area.tmx"
+    # "maps/Grass-Area.tmx"
 ]
 
 PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
@@ -61,7 +65,7 @@ class MyGame(arcade.Window):
 
         # Our physics engine
         self.physics_engine = None
-
+        self.level = 1
         # Game Logic
         self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
@@ -85,17 +89,26 @@ class MyGame(arcade.Window):
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-
+        #repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
 
         # Set up the player, specifically placing it at these coordinates.
 
         self.player_sprite = arcade.Sprite("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png", CHARACTER_SCALING)
-        self.player_sprite.center_x = 500
-        self.player_sprite.center_y = 375
+        self.player_sprite.center_x = 927
+        self.player_sprite.center_y = 900
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite("Player", self.player_sprite)
+        self.exit_list = arcade.SpriteList()
+        #self.scene.add_sprite("castle", self.castle_sprite)
+
+
+        #map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #my_map = arcade.tilemap.read_tmx(map_name)
+
+        #self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
+
 
 
         # # Create the ground
@@ -114,6 +127,8 @@ class MyGame(arcade.Window):
         self.physics_engine = arcade.PhysicsEngineSimple(
             self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS),
         )
+
+    #def load_new_level(self):
 
     def on_draw(self):
         """Render the screen."""
@@ -179,6 +194,13 @@ class MyGame(arcade.Window):
         # Move the player with the physics engine
         self.physics_engine.update()
         self.texture_update()
+        #if self.player_sprite.center_x >= self.end_of_map:
+         #   self.level += 1
+
+          #  self.setup(self.level)
+           # self.view_left = 0
+            #self.view_bottom = 0 
+            #changed_viewport = True
 
     def texture_update(self):
         """Textures changed by directions"""
