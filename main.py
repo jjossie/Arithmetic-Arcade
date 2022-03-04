@@ -30,7 +30,7 @@ class MyGame(arcade.Window):
 
         # Our physics engine
         self.physics_engine = None
-
+        self.level = 1
         # Game Logic
         self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
@@ -57,12 +57,22 @@ class MyGame(arcade.Window):
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-
+        #repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        # self.scene.add_sprite("Player", self.player_sprite)
+        self.exit_list = arcade.SpriteList()
+        #self.scene.add_sprite("castle", self.castle_sprite)
+
+
+        #map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        #my_map = arcade.tilemap.read_tmx(map_name)
+
+        #self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
+
 
         # Make a test math problem
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
@@ -103,6 +113,7 @@ class MyGame(arcade.Window):
 
         # Draw Math Layer
         self.scene.get_sprite_list("Numbers").update_animation()
+
 
         self.caption()
 
