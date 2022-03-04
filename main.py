@@ -74,13 +74,13 @@ class MyGame(arcade.Window):
         #     problem.draw()
 
         self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
-        problem2 = VisualMathProblem(self.scene, 400, 500, 5, 15)
-        problem3 = VisualMathProblem(self.scene, 400, 700, 10, 20)
-        problem4 = VisualMathProblem(self.scene, 400, 900, 10, 30)
+        # problem2 = VisualMathProblem(self.scene, 400, 500, 5, 15)
+        # problem3 = VisualMathProblem(self.scene, 400, 700, 10, 20)
+        # problem4 = VisualMathProblem(self.scene, 400, 900, 10, 30)
         self.problem.draw()
-        problem2.draw()
-        problem3.draw()
-        problem4.draw()
+        # problem2.draw()
+        # problem3.draw()
+        # problem4.draw()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
