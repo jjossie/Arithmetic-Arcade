@@ -225,7 +225,12 @@ class MyGame(arcade.Window):
                 self.player_sprite.center_y = (MAP_SIZE + VIEWPORT_MARGIN/5)    
         else:
             self.scroll_to_player()
+        
+        # Checking for collision with the boxes
+        block_collision_list = arcade.check_for_collision_with_list(self.player_sprite, self.scene["LAYER_NAME_NUMBER"])
 
+        for block in block_collision_list:
+            print("COLLISION")
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
