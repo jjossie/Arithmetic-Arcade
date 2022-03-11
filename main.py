@@ -1,5 +1,5 @@
 import arcade
-from matplotlib.pyplot import show
+# from matplotlib.pyplot import show
 from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
 from pyglet.math import Vec2
 from math import sqrt
@@ -18,6 +18,7 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
 
         # Our scene object
+        self.exit_list = None
         self.problem = None
         self.scene = None
         self.player = Player(self)
@@ -57,40 +58,26 @@ class MyGame(arcade.Window):
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        #repeat line 91 and line 88
+        # repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
-        #self.scene.add_sprite("castle", self.castle_sprite)
+        # self.scene.add_sprite("castle", self.castle_sprite)
 
+        # map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        # my_map = arcade.tilemap.read_tmx(map_name)
 
-        #map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
-        #my_map = arcade.tilemap.read_tmx(map_name)
-
-        #self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
-
+        # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
 
         # Make a test math problem
-        self.scene.add_sprite_list(LAYER_NAME_NUMBER)
-        # self.problems.append(VisualMathProblem(self.scene, 400, 300, 1, 10))
-        # self.problems.append(VisualMathProblem(self.scene, 400, 400, 5, 15))
-        # self.problems.append(VisualMathProblem(self.scene, 400, 500, 10, 20))
-        # self.problems.append(VisualMathProblem(self.scene, 400, 600, 10, 30))
-        # for problem in self.problems:
-        #     problem.draw()
-
         self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
-        # problem2 = VisualMathProblem(self.scene, 400, 500, 5, 15)
-        # problem3 = VisualMathProblem(self.scene, 400, 700, 10, 20)
-        # problem4 = VisualMathProblem(self.scene, 400, 900, 10, 30)
         self.problem.draw()
-        # problem2.draw()
-        # problem3.draw()
-        # problem4.draw()
+        self.problem.log()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -112,8 +99,7 @@ class MyGame(arcade.Window):
         self.camera.use()
 
         # Draw Math Layer
-        self.scene.get_sprite_list("Numbers").update_animation()
-
+        self.scene.get_sprite_list(LAYER_NAME_NUMBER).update_animation()
 
         self.caption()
 
@@ -125,13 +111,18 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
         self.player.update_player_speed()
         self.player.texture_update()
-        self.caption()
+        self.player_hit_number()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
 
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
+
+    def player_hit_number(self):
+        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER))
+        if len(collisions) != 0:
+            print(collisions)
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
@@ -140,9 +131,9 @@ class MyGame(arcade.Window):
         cap = "Press Space to lift it up"
 
         left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
-                    self.problem.lhs.center_y - self.player.center_y) ** 2)
+                self.problem.lhs.center_y - self.player.center_y) ** 2)
         right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
-                    self.problem.rhs.center_y - self.player.center_y) ** 2)
+                self.problem.rhs.center_y - self.player.center_y) ** 2)
 
         if left_distance < 55:
             show_caption = True
