@@ -1,38 +1,10 @@
 import arcade
-from matplotlib.pyplot import show
+# from matplotlib.pyplot import show
 from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
 from pyglet.math import Vec2
 from math import sqrt
-
-# Constants
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 750
-SCREEN_TITLE = "RUNTIME TERROR"
-MAP = ""
-MAP_SIZE = 1550
-
-# Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5
-
-CAMERA_SPEED = 0.1
-VIEWPORT_MARGIN = 200
-
-# Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.75
-TILE_SCALING = 1
-
-MAPS = [
-    # "maps/joel-demo.tmx",
-    "maps/Main-Spawn.tmx"
-]
-
-PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
-
-LAYER_NAME_WALLS = "walls"
-LAYER_NAME_BACKGROUND = "background"
-LAYER_NAME_PLAYER = "player"
-
-PLAYER_TEXTURES = []
+from constant import *
+from player import Player
 
 
 class MyGame(arcade.Window):
@@ -46,8 +18,10 @@ class MyGame(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
 
         # Our scene object
+        self.exit_list = None
         self.problem = None
         self.scene = None
+        self.player = Player(self)
 
         # Load Textures
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
@@ -55,17 +29,9 @@ class MyGame(arcade.Window):
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_20.png"))
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_11.png"))
 
-        # Separate variable that holds the player sprite
-        self.player_sprite = None
-
-        self.left_pressed = False
-        self.right_pressed = False
-        self.up_pressed = False
-        self.down_pressed = False
-
         # Our physics engine
         self.physics_engine = None
-
+        self.level = 1
         # Game Logic
         self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
@@ -78,7 +44,6 @@ class MyGame(arcade.Window):
         self.gui_camera = None
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
-
 
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
@@ -93,30 +58,34 @@ class MyGame(arcade.Window):
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-
+        # repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER)
 
-        # Set up the player, specifically placing it at these coordinates.
-
-        self.player_sprite = arcade.Sprite("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png",
-                                           CHARACTER_SCALING)
-        self.player_sprite.center_x = 500
-        self.player_sprite.center_y = 375
         # self.player_list.append(self.player_sprite)
-        self.scene.add_sprite("Player", self.player_sprite)
+        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        # self.scene.add_sprite("Player", self.player_sprite)
+        self.exit_list = arcade.SpriteList()
+        # self.scene.add_sprite("castle", self.castle_sprite)
 
-        self.problem = VisualMathProblem(self.scene, 400, 300)
+        # map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
+        # my_map = arcade.tilemap.read_tmx(map_name)
+
+        # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
+
+        # Make a test math problem
+        self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
         self.problem.draw()
+        self.problem.log()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite, [
+            self.player, [
                 self.scene.get_sprite_list(LAYER_NAME_WALLS),
                 self.scene.get_sprite_list(LAYER_NAME_NUMBER)
             ]
         )
-
 
     def on_draw(self):
         """Render the screen."""
@@ -130,165 +99,87 @@ class MyGame(arcade.Window):
         self.camera.use()
 
         # Draw Math Layer
-        self.scene.get_sprite_list("Numbers").update_animation()
+        self.scene.get_sprite_list(LAYER_NAME_NUMBER).update_animation()
 
-        
         self.caption()
 
-
-    def update_player_speed(self):
-
-        # Calculate speed base on keys pressed
-        self.player_sprite.change_x = 0
-        self.player_sprite.change_y = 0
-
-        
-        if self.up_pressed and not self.down_pressed:
-
-            self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
-        elif self.down_pressed and not self.up_pressed:
-            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
-        if self.left_pressed and not self.right_pressed:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-        elif self.right_pressed and not self.left_pressed:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
-
-
-    def on_key_press(self, key, modifiers):
-        """Called whenever a key is pressed."""
-
-        if key == arcade.key.UP or key == arcade.key.W:
-            self.up_pressed = True
-            self.update_player_speed()
-        elif key == arcade.key.DOWN or key == arcade.key.S:
-            self.down_pressed = True
-            self.update_player_speed()
-        elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.left_pressed = True
-            self.update_player_speed()
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.right_pressed = True
-            self.update_player_speed()
-
-
-    def on_key_release(self, key, modifiers):
-        """Called when the user releases a key."""
-
-        if key == arcade.key.UP or key == arcade.key.W:
-            self.up_pressed = False
-            self.update_player_speed()
-        elif key == arcade.key.DOWN or key == arcade.key.S:
-            self.down_pressed = False
-            self.update_player_speed()
-        elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.left_pressed = False
-            self.update_player_speed()
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.right_pressed = False
-            self.update_player_speed()
-
-
     def on_update(self, delta_time):
-        
+
         """Movement and game logic"""
 
         # Move the player with the physics engine
         self.physics_engine.update()
-        self.texture_update()
-        self.caption()
+        self.player.update_player_speed()
+        self.player.texture_update()
+        self.player_hit_number()
 
-        # Checking for collision with the boxes
-        block_collision_list = arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Numbers"))
+    def on_key_press(self, symbol: int, modifiers: int):
+        self.player.on_key_press(symbol, modifiers)
 
-        for block in block_collision_list:
-            print("COLLISION")
+    def on_key_release(self, symbol: int, modifiers: int):
+        self.player.on_key_release(symbol, modifiers)
 
-
-    def texture_update(self):
-        """Textures changed by directions"""
-
-        if self.up_pressed:
-            self.player_sprite.texture = PLAYER_TEXTURES[0]
-        if self.down_pressed:
-            self.player_sprite.texture = PLAYER_TEXTURES[1]
-        if self.left_pressed:
-            self.player_sprite.texture = PLAYER_TEXTURES[2]
-        if self.right_pressed:
-            self.player_sprite.texture = PLAYER_TEXTURES[3]
-
-        # This does not allow the player go over
-        if self.player_sprite.center_x < (VIEWPORT_MARGIN*6/5):
-            if self.player_sprite.center_x <= (VIEWPORT_MARGIN/10):    
-                self.player_sprite.center_x = (VIEWPORT_MARGIN/10)
-        elif self.player_sprite.center_y < (VIEWPORT_MARGIN*1.2):
-            if self.player_sprite.center_y <= (VIEWPORT_MARGIN/10):    
-                self.player_sprite.center_y = (VIEWPORT_MARGIN/10)
-        elif self.player_sprite.center_x > (MAP_SIZE-VIEWPORT_MARGIN*0.8):
-            if self.player_sprite.center_x >= (MAP_SIZE+20):
-                self.player_sprite.center_x = (MAP_SIZE+20)
-        elif self.player_sprite.center_y > (MAP_SIZE - VIEWPORT_MARGIN*0.8):
-            if self.player_sprite.center_y >= (MAP_SIZE + VIEWPORT_MARGIN/5):
-                self.player_sprite.center_y = (MAP_SIZE + VIEWPORT_MARGIN/5)    
-        else:
-            self.scroll_to_player()
-        
-        
+    def player_hit_number(self):
+        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER))
+        if len(collisions) != 0:
+            print(collisions)
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
         show_caption = False
         cap = "Press Space to lift it up"
-        
-        left_distance = sqrt((self.problem.lhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.lhs_sprite.center_y-self.player_sprite.center_y)**2)
-        right_distance = sqrt((self.problem.rhs_sprite.center_x-self.player_sprite.center_x)**2+(self.problem.rhs_sprite.center_y-self.player_sprite.center_y)**2)
 
-        if left_distance < 55: 
-            show_caption = True 
+        left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
+                self.problem.lhs.center_y - self.player.center_y) ** 2)
+        right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
+                self.problem.rhs.center_y - self.player.center_y) ** 2)
+
+        if left_distance < 55:
+            show_caption = True
         elif right_distance < 55:
-            show_caption = True 
-        else: 
+            show_caption = True
+        else:
             show_caption = False
 
         if show_caption:
             arcade.draw_text(
-            cap,
-            self.view_left + SCREEN_WIDTH*0.3,
-            self.view_bottom + SCREEN_HEIGHT*0.8,
-            arcade.csscolor.WHITE,
-            30,)
+                cap,
+                self.view_left + SCREEN_WIDTH * 0.3,
+                self.view_bottom + SCREEN_HEIGHT * 0.8,
+                arcade.csscolor.WHITE,
+                30, )
         else:
             arcade.draw_text(
-            " ",
-            0,
-            0,
-            arcade.csscolor.WHITE,
-            18,)
-     
-        
+                " ",
+                0,
+                0,
+                arcade.csscolor.WHITE,
+                18, )
+
     def scroll_to_player(self):
 
         # --- Manage Scrolling ---
 
         # Scroll left
         left_boundary = self.view_left + VIEWPORT_MARGIN
-        if self.player_sprite.left < left_boundary:
-            self.view_left -= left_boundary - self.player_sprite.left
+        if self.player.left < left_boundary:
+            self.view_left -= left_boundary - self.player.left
 
         # Scroll right
         right_boundary = self.view_left + self.width - VIEWPORT_MARGIN
-        if self.player_sprite.right > right_boundary:
-            self.view_left += self.player_sprite.right - right_boundary
+        if self.player.right > right_boundary:
+            self.view_left += self.player.right - right_boundary
 
         # Scroll up
         top_boundary = self.view_bottom + self.height - VIEWPORT_MARGIN
-        if self.player_sprite.top > top_boundary:
-            self.view_bottom += self.player_sprite.top - top_boundary
+        if self.player.top > top_boundary:
+            self.view_bottom += self.player.top - top_boundary
 
         # Scroll down
         bottom_boundary = self.view_bottom + VIEWPORT_MARGIN
-        if self.player_sprite.bottom < bottom_boundary:
-            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
+        if self.player.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.player.bottom
 
         # Scroll to the proper location
         position = Vec2(self.view_left, self.view_bottom)
