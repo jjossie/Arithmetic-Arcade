@@ -1,6 +1,5 @@
 import arcade
-# from matplotlib.pyplot import show
-from numbers_and_math import VisualMathProblem, LAYER_NAME_NUMBER
+from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
 from math import sqrt
 from constant import *
@@ -62,6 +61,7 @@ class MyGame(arcade.Window):
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
@@ -120,9 +120,10 @@ class MyGame(arcade.Window):
         self.player.on_key_release(symbol, modifiers)
 
     def player_hit_number(self):
-        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER))
+        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
         if len(collisions) != 0:
-            print(collisions)
+            return True
+        return False
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
@@ -130,19 +131,19 @@ class MyGame(arcade.Window):
         show_caption = False
         cap = "Press Space to lift it up"
 
-        left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
-                self.problem.lhs.center_y - self.player.center_y) ** 2)
-        right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
-                self.problem.rhs.center_y - self.player.center_y) ** 2)
+        # left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
+        #         self.problem.lhs.center_y - self.player.center_y) ** 2)
+        # right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
+        #         self.problem.rhs.center_y - self.player.center_y) ** 2)
+        #
+        # if left_distance < 55:
+        #     show_caption = True
+        # elif right_distance < 55:
+        #     show_caption = True
+        # else:
+        #     show_caption = False
 
-        if left_distance < 55:
-            show_caption = True
-        elif right_distance < 55:
-            show_caption = True
-        else:
-            show_caption = False
-
-        if show_caption:
+        if self.player_hit_number():
             arcade.draw_text(
                 cap,
                 self.view_left + SCREEN_WIDTH * 0.3,

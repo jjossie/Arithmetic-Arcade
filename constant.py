@@ -26,6 +26,7 @@ LAYER_NAME_WALLS = "walls"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_PLAYER = "player"
 LAYER_NAME_NUMBER = "Numbers"
+LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 
 PLAYER_TEXTURES = []
 
