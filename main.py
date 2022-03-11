@@ -197,6 +197,12 @@ class MyGame(arcade.Window):
         self.texture_update()
         self.caption()
 
+        # Checking for collision with the boxes
+        block_collision_list = arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Numbers"))
+
+        for block in block_collision_list:
+            print("COLLISION")
+
 
     def texture_update(self):
         """Textures changed by directions"""
@@ -226,11 +232,7 @@ class MyGame(arcade.Window):
         else:
             self.scroll_to_player()
         
-        # Checking for collision with the boxes
-        block_collision_list = arcade.check_for_collision_with_list(self.player_sprite, self.scene["LAYER_NAME_NUMBER"])
-
-        for block in block_collision_list:
-            print("COLLISION")
+        
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
