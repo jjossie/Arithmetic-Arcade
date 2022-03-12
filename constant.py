@@ -32,4 +32,5 @@ PLAYER_TEXTURES = []
 
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
+TRANSPARENT_BOX_PATH = "assets/transparent.png"
 TILE_SIZE = 32

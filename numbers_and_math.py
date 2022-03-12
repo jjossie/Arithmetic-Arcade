@@ -17,7 +17,9 @@ class NumberBlock(arcade.Sprite):
         self.texture = arcade.load_texture(CRATE_BLUE_PATH)
         self.scale = TILE_SCALING
         self._hit_box_algorithm = "None"
-        self.hit_box_sprite = arcade.Sprite("assets/teansparent.png", scale=TILE_SCALING * 1.1,
+        self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
+                                            scale=TILE_SCALING * 1.1,
+                                            hit_box_algorithm="None",  # This is important
                                             center_x=self.center_x,
                                             center_y=self.center_y)
 
@@ -195,9 +197,10 @@ class VisualMathProblem:
         self.scene = scene
         self.center_x = center_x
         self.center_y = center_y
-
         self.sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
         self.problem = get_clean_problem(min, max)
+
+        # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
         self.operator = NumberBlockGroup(scene=self.scene, from_number=str(self.problem.operator))
         self.rhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.rhs)
