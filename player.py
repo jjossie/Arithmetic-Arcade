@@ -13,6 +13,7 @@ class Player(arcade.Sprite):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
+        self.space_pressed = False
 
         # Load Textures
         PLAYER_TEXTURES.append(
@@ -73,6 +74,8 @@ class Player(arcade.Sprite):
         else:
             self.window.scroll_to_player()
 
+
+
     def on_key_press(self, key, modifiers):
         """Called by the arcade.Window object whenever a key is pressed."""
 
@@ -84,6 +87,8 @@ class Player(arcade.Sprite):
             self.left_pressed = True
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = True
+        elif key == arcade.key.SPACE:
+            self.space_pressed = True
 
     def on_key_release(self, key, modifiers):
         """Called by the arcade.Window object when the user releases a key."""
@@ -96,6 +101,8 @@ class Player(arcade.Sprite):
             self.left_pressed = False
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
+        elif key == arcade.key.SPACE:
+            self.space_pressed = False
 
     def texture_update(self):
         """Textures changed by directions"""

@@ -5,6 +5,17 @@ import operator
 from constant import *
 
 
+class NumberBlockHitbox(arcade.Sprite):
+    def __init__(self, parent_block):
+        super().__init__(TRANSPARENT_BOX_PATH,
+                        scale=TILE_SCALING * 1.1,
+                        hit_box_algorithm="None",  # This is important
+                        center_x=parent_block.center_x,
+                        center_y=parent_block.center_y)
+        self.parent_block = parent_block
+
+
+
 class NumberBlock(arcade.Sprite):
     """
     A sprite that draws itself as a crate with its stored value as a number on top.
@@ -17,11 +28,8 @@ class NumberBlock(arcade.Sprite):
         self.texture = arcade.load_texture(CRATE_BLUE_PATH)
         self.scale = TILE_SCALING
         self._hit_box_algorithm = "None"
-        self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
-                                            scale=TILE_SCALING * 1.1,
-                                            hit_box_algorithm="None",  # This is important
-                                            center_x=self.center_x,
-                                            center_y=self.center_y)
+        self.player = None
+        self.hit_box_sprite = NumberBlockHitbox(self)
 
         # Add myself to a sprite list
         scene.get_sprite_list(LAYER_NAME_NUMBER).append(self)
@@ -30,6 +38,10 @@ class NumberBlock(arcade.Sprite):
 
     def update_animation(self, delta_time: float = 1 / 60):
         # Draw this block's numeric value on top of this sprite.
+        if self.player is not None:
+            self.center_x = self.player.center_x
+            self.center_y = self.player.center_y
+
         arcade.draw_text(
             f"{self.value}",
             start_x=self.center_x,
@@ -53,6 +65,12 @@ class NumberBlock(arcade.Sprite):
         self.center_y = y
         self.hit_box_sprite.center_x = x
         self.hit_box_sprite.center_y = y
+
+    def grab(self, player):
+        self.player = player
+
+    def release(self):
+        self.player = None
 
     def __str__(self):
         return super.__str__(self) + f"\nNumberBlock Val: {self.value} \nSpriteList: {self.sprite_lists}" \
@@ -138,7 +156,6 @@ class NumberBlockGroup:
     def log(self):
         for block in self._blocks:
             print(str(block))
-
 
 class SimpleMathProblem:
     """
