@@ -26,9 +26,11 @@ LAYER_NAME_WALLS = "walls"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_PLAYER = "player"
 LAYER_NAME_NUMBER = "Numbers"
+LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 
 PLAYER_TEXTURES = []
 
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
+TRANSPARENT_BOX_PATH = "assets/transparent.png"
 TILE_SIZE = 32
