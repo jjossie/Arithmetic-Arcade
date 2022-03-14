@@ -4,15 +4,18 @@ import operator
 from enum import Enum
 
 from constant import *
+from player import PlayerOrientation
+
 
 class NumberBlockHitbox(arcade.Sprite):
     def __init__(self, parent_block):
         super().__init__(TRANSPARENT_BOX_PATH,
-                        scale=TILE_SCALING * 1.1,
-                        hit_box_algorithm="None",  # This is important
-                        center_x=parent_block.center_x,
-                        center_y=parent_block.center_y)
+                         scale=TILE_SCALING * 1.1,
+                         hit_box_algorithm="None",  # This is important
+                         center_x=parent_block.center_x,
+                         center_y=parent_block.center_y)
         self.parent_block = parent_block
+
 
 class BlockGroupPosition(Enum):
     """
@@ -73,9 +76,20 @@ class NumberBlock(arcade.Sprite):
 
     def update_animation(self, delta_time: float = 1 / 60):
         # Draw this block's numeric value on top of this sprite.
-        if self.player is not None:
-            self.center_x = self.player.center_x
-            self.center_y = self.player.center_y
+        p = self.player
+        if p is not None:
+            # Determine the target coordinate relative to the player
+            if p.orientation == PlayerOrientation.UP:
+                target_x, target_y = p.center_x, p.top + p.collision_radius
+            elif p.orientation == PlayerOrientation.DOWN:
+                target_x, target_y = p.center_x, p.bottom - p.collision_radius
+            elif p.orientation == PlayerOrientation.LEFT:
+                target_x, target_y = p.left - p.collision_radius, p.center_y
+            else:
+                # Assume facing right
+                target_x, target_y = p.right + p.collision_radius, p.center_y
+
+            self.move_to(target_x, target_y)
 
     def move_to(self, x, y):
         """
@@ -92,7 +106,9 @@ class NumberBlock(arcade.Sprite):
         self.symbol_sprite.center_y = y
 
     def grab(self, player):
-        self.player = player
+        if self.block_type == BlockType.MOVABLE \
+                or self.block_type == BlockType.INCORRECT:
+            self.player = player
 
     def release(self):
         self.player = None

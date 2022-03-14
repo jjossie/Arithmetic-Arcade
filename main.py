@@ -1,5 +1,5 @@
 import arcade
-from numbers_and_math import VisualMathProblem
+from numbers_and_math import VisualMathProblem, NumberBlock
 from pyglet.math import Vec2
 from math import sqrt
 from constant import *
@@ -111,8 +111,6 @@ class MyGame(arcade.Window):
         self.player.update_player_speed()
         self.player.texture_update()
         self.check_block_collisions()
-            
-
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
@@ -123,29 +121,19 @@ class MyGame(arcade.Window):
     def check_block_collisions(self):
         blocks = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
         if len(blocks) != 0:
+            block = blocks[0].parent_block
+            # Make sure this block is actually a NumberBlock
+            assert(isinstance(block, NumberBlock))
             if self.player.space_pressed:
-                blocks[0].parent_block.grab(self.player)
+                block.grab(self.player)
             else:
                 self.caption()
-                blocks[0].parent_block.release()
+                block.release()
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
-        show_caption = False
         cap = "Press Space to lift it up"
-
-        # left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
-        #         self.problem.lhs.center_y - self.player.center_y) ** 2)
-        # right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
-        #         self.problem.rhs.center_y - self.player.center_y) ** 2)
-        #
-        # if left_distance < 55:
-        #     show_caption = True
-        # elif right_distance < 55:
-        #     show_caption = True
-        # else:
-        #     show_caption = False
 
         arcade.draw_text(
             cap,
@@ -153,13 +141,6 @@ class MyGame(arcade.Window):
             self.view_bottom + SCREEN_HEIGHT * 0.8,
             arcade.csscolor.WHITE,
             30, )
-        # else:
-        #     arcade.draw_text(
-        #         " ",
-        #         0,
-        #         0,
-        #         arcade.csscolor.WHITE,
-        #         18, )
 
     def scroll_to_player(self):
 

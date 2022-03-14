@@ -1,7 +1,15 @@
 import imp
+from enum import Enum
 import arcade
 
 from constant import *
+
+
+class PlayerOrientation(Enum):
+    UP = 0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3
 
 
 class Player(arcade.Sprite):
@@ -14,6 +22,8 @@ class Player(arcade.Sprite):
         self.up_pressed = False
         self.down_pressed = False
         self.space_pressed = False
+
+        self.orientation: PlayerOrientation = PlayerOrientation.DOWN
 
         # Load Textures
         PLAYER_TEXTURES.append(
@@ -108,10 +118,11 @@ class Player(arcade.Sprite):
         """Textures changed by directions"""
 
         if self.up_pressed:
-            self.texture = PLAYER_TEXTURES[0]
+            self.orientation = PlayerOrientation.UP
         if self.down_pressed:
-            self.texture = PLAYER_TEXTURES[1]
+            self.orientation = PlayerOrientation.DOWN
         if self.left_pressed:
-            self.texture = PLAYER_TEXTURES[2]
+            self.orientation = PlayerOrientation.LEFT
         if self.right_pressed:
-            self.texture = PLAYER_TEXTURES[3]
+            self.orientation = PlayerOrientation.RIGHT
+        self.texture = PLAYER_TEXTURES[self.orientation.value]
