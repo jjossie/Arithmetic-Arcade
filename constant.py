@@ -14,7 +14,7 @@ VIEWPORT_MARGIN = 200
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.75
 TILE_SCALING = 1
-NUMBER_SCALING = 1
+NUMBER_SCALING = 1.3
 
 MAPS = [
     # "maps/joel-demo.tmx",
