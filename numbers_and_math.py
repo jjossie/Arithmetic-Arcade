@@ -49,37 +49,44 @@ class NumberBlock(arcade.Sprite):
         self.texture = arcade.load_texture(CRATE_BLUE_PATH)
         self.scale = TILE_SCALING
         self._hit_box_algorithm = "None"
+        # Auxiliary sprites. One for the hitbox, another for the number/symbol.
         self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
                                             scale=TILE_SCALING * 1.1,
                                             hit_box_algorithm="None",  # This is important
                                             center_x=self.center_x,
                                             center_y=self.center_y)
+        self.symbol_sprite = arcade.Sprite(self._get_symbol_path(),
+                                           scale=NUMBER_SCALING,
+                                           hit_box_algorithm="None")
 
         # Add myself to a sprite list
         scene.get_sprite_list(LAYER_NAME_NUMBER).append(self)
         # Add my hit box sprite to the other one
         scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX).append(self.hit_box_sprite)
+        # And finally, add my symbol sprite list to that top layer
+        scene.get_sprite_list(LAYER_NAME_NUMBER_SYMBOLS).append(self.symbol_sprite)
 
     def update_animation(self, delta_time: float = 1 / 60):
         # Draw this block's numeric value on top of this sprite.
-        arcade.draw_text(
-            f"{self.value}",
-            start_x=self.center_x,
-            start_y=self.center_y,
-            color=arcade.color.WHITE,
-            font_size=18 * TILE_SCALING,
-            width=int(self.width),
-            align="center",
-            font_name="calibri",
-            bold=True,
-            anchor_x="center",
-            anchor_y="center",
-        )
+        # arcade.draw_text(
+        #     f"{self.value}",
+        #     start_x=self.center_x,
+        #     start_y=self.center_y,
+        #     color=arcade.color.WHITE,
+        #     font_size=18 * TILE_SCALING,
+        #     width=int(self.width),
+        #     align="center",
+        #     font_name="calibri",
+        #     bold=True,
+        #     anchor_x="center",
+        #     anchor_y="center",
+        # )
+        pass
 
     def move_to(self, x, y):
         """
         Use this to move a NumberBlock rather than setting center_x and center_y directly.
-        Moves the sprite along with its accompanying hit box sprite.
+        Moves the sprite along with its accompanying hit box and symbol sprites.
         This also exists for the purpose of polymorphism - to be synonymous with NumberBlockGroup,
         which has the same function.
         """
@@ -87,6 +94,8 @@ class NumberBlock(arcade.Sprite):
         self.center_y = y
         self.hit_box_sprite.center_x = x
         self.hit_box_sprite.center_y = y
+        self.symbol_sprite.center_x = x
+        self.symbol_sprite.center_y = y
 
     def set_block_type(self, block_type: BlockType):
         self.block_type = block_type
@@ -97,9 +106,25 @@ class NumberBlock(arcade.Sprite):
         self.configure_texture()
 
     def configure_texture(self):
-        path = f"{CRATE_BASE_PATH}{self.block_type.value}{self.block_group_position.value}{CRATE_PATH_EXT}"
+        path = f"{CRATE_BASE_PATH}{self.block_type.value}{self.block_group_position.value}{IMG_PATH_EXT}"
         # print(path)  # For debugging purposes
         self.texture = arcade.load_texture(path)
+
+    def _get_symbol_path(self):
+        filename = ""
+        if self.value == "+":
+            filename = "add"
+        elif self.value == "/":
+            filename = "divide2"
+        elif self.value == "-":
+            filename = "subtract"
+        elif self.value == "*":
+            filename = "multiply"
+        elif self.value == "=":
+            filename = "equals"
+        else:
+            filename = self.value
+        return f"{NUM_BASE_PATH}{filename}{IMG_PATH_EXT}"
 
     def __str__(self):
         return super.__str__(self) + f"\nNumberBlock Val: {self.value} \nSpriteList: {self.sprite_lists}" \
