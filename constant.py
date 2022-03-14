@@ -7,6 +7,7 @@ MAP_SIZE = 1550
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
+PLAYER_RUN_MULTIPLIER = 1.5
 
 CAMERA_SPEED = 0.1
 VIEWPORT_MARGIN = 200
