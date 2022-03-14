@@ -30,6 +30,8 @@ LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 
 PLAYER_TEXTURES = []
 
+CRATE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/"
+CRATE_PATH_EXT = ".png"
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
 TRANSPARENT_BOX_PATH = "assets/transparent.png"
