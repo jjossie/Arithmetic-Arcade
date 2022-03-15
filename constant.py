@@ -1,6 +1,6 @@
 # Constants
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 750
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 900
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""
 MAP_SIZE = 1550
@@ -33,4 +33,5 @@ PLAYER_TEXTURES = []
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
 TRANSPARENT_BOX_PATH = "assets/transparent.png"
+TARGET_BOX = "assets\kenney_sokobanpack\PNG\Retina\Crates\crate_29.png"
 TILE_SIZE = 32
