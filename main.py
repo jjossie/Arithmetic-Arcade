@@ -108,9 +108,8 @@ class MyGame(arcade.Window):
         """Movement and game logic"""
         # Move the player with the physics engine
         self.physics_engine.update()
-        self.player.update_player_speed()
-        self.player.texture_update()
-        self.check_block_collisions()
+        self.player.update()
+        # self.check_block_collisions()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
@@ -118,17 +117,17 @@ class MyGame(arcade.Window):
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
 
-    def check_block_collisions(self):
-        blocks = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
-        if len(blocks) != 0:
-            block = blocks[0].parent_block
-            # Make sure this block is actually a NumberBlock
-            assert(isinstance(block, NumberBlock))
-            if self.player.space_pressed:
-                block.grab(self.player)
-            else:
-                self.caption()
-                block.release()
+    # def check_block_collisions(self):
+    #     blocks = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
+    #     if len(blocks) != 0:
+    #         block = blocks[0].parent_block
+    #         # Make sure this block is actually a NumberBlock
+    #         assert(isinstance(block, NumberBlock))
+    #         if self.player.space_pressed:
+    #             block.grab(self.player)
+    #         else:
+    #             self.caption()
+    #             block.release()
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""

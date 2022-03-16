@@ -4,7 +4,7 @@ import operator
 from enum import Enum
 
 from constant import *
-from player import PlayerOrientation
+# from player import PlayerOrientation
 
 
 class NumberBlockHitbox(arcade.Sprite):
@@ -74,22 +74,23 @@ class NumberBlock(arcade.Sprite):
         # And finally, add my symbol sprite list to that top layer
         scene.get_sprite_list(LAYER_NAME_NUMBER_SYMBOLS).append(self.symbol_sprite)
 
-    def update_animation(self, delta_time: float = 1 / 60):
+    # def update_animation(self, delta_time: float = 1 / 60):
         # Draw this block's numeric value on top of this sprite.
-        p = self.player
-        if p is not None:
-            # Determine the target coordinate relative to the player
-            if p.orientation == PlayerOrientation.UP:
-                target_x, target_y = p.center_x, p.top + p.collision_radius
-            elif p.orientation == PlayerOrientation.DOWN:
-                target_x, target_y = p.center_x, p.bottom - p.collision_radius
-            elif p.orientation == PlayerOrientation.LEFT:
-                target_x, target_y = p.left - p.collision_radius, p.center_y
-            else:
-                # Assume facing right
-                target_x, target_y = p.right + p.collision_radius, p.center_y
-
-            self.move_to(target_x, target_y)
+        # p = self.player
+        # if p is not None:
+        #     # Determine the target coordinate relative to the player
+        #     offset = p.collision_radius / 2
+        #     if p.orientation == PlayerOrientation.UP:
+        #         target_x, target_y = p.center_x, p.top + offset
+        #     elif p.orientation == PlayerOrientation.DOWN:
+        #         target_x, target_y = p.center_x, p.bottom - offset
+        #     elif p.orientation == PlayerOrientation.LEFT:
+        #         target_x, target_y = p.left - offset, p.center_y
+        #     else:
+        #         # Assume facing right
+        #         target_x, target_y = p.right + offset, p.center_y
+        #
+        #     self.move_to(target_x, target_y)
 
     def move_to(self, x, y):
         """

@@ -3,6 +3,7 @@ from enum import Enum
 import arcade
 
 from constant import *
+from numbers_and_math import NumberBlock, BlockType
 
 
 class PlayerOrientation(Enum):
@@ -15,6 +16,7 @@ class PlayerOrientation(Enum):
 class Player(arcade.Sprite):
     def __init__(self, window):
         super().__init__()
+        self._block_position_offset = None
         self.window = window
 
         self.left_pressed = False
@@ -24,6 +26,7 @@ class Player(arcade.Sprite):
         self.space_pressed = False
 
         self.orientation: PlayerOrientation = PlayerOrientation.DOWN
+        self.block = None
 
         # Load Textures
         PLAYER_TEXTURES.append(
@@ -46,6 +49,14 @@ class Player(arcade.Sprite):
         Set up this player sprite. Not currently being used for anything since everything is
         initialized in __init__, but this is here in case we need it.
         """
+
+    def update(self):
+        self.update_player_speed()
+        self.texture_update()
+        self.check_for_block_collisions()
+        self._move_block()
+        if not self.space_pressed:
+            self.release_block()
 
     def update_player_speed(self):
 
@@ -83,8 +94,6 @@ class Player(arcade.Sprite):
                 self.center_y = (MAP_SIZE + VIEWPORT_MARGIN / 5)
         else:
             self.window.scroll_to_player()
-
-
 
     def on_key_press(self, key, modifiers):
         """Called by the arcade.Window object whenever a key is pressed."""
@@ -126,3 +135,53 @@ class Player(arcade.Sprite):
         if self.right_pressed:
             self.orientation = PlayerOrientation.RIGHT
         self.texture = PLAYER_TEXTURES[self.orientation.value]
+
+    def grab_block(self, block: NumberBlock):
+        if block.block_type == BlockType.MOVABLE \
+                or block.block_type == BlockType.INCORRECT:
+            self.block = block
+            self._block_position_offset = self._get_block_position_offset()
+
+    def release_block(self):
+        self.block = None
+
+    def check_for_block_collisions(self):
+        if self.block is None:
+            blocks = arcade.check_for_collision_with_list(self, self.window.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
+            if len(blocks) != 0:
+                block = blocks[0].parent_block
+                # Make sure this block is actually a NumberBlock
+                assert(isinstance(block, NumberBlock))
+                if self.space_pressed:
+                    self.grab_block(block)
+                else:
+                    self.window.caption()
+
+    def _move_block(self):
+        if self.block is not None:
+            self.block.move_to(
+                self.center_x + self._block_position_offset[0],
+                self.center_y + self._block_position_offset[1]
+            )
+
+    def _get_block_position_offset(self):
+        """
+        Determine the position offset for the block relative to the player for
+        a given instant in time.
+        """
+        assert(self.block is not None)
+        offset_x = self.block.center_x - self.center_x
+        offset_y = self.block.center_y - self.center_y
+        # offset = self.collision_radius * CHARACTER_SCALING
+        # offset = TILE_SIZE + self.collision_radius
+        offset = 1
+        if self.orientation == PlayerOrientation.UP:
+            offset_y += offset
+        elif self.orientation == PlayerOrientation.DOWN:
+            offset_y -= offset
+        elif self.orientation == PlayerOrientation.LEFT:
+            offset_x -= offset
+        else:
+            # Assume facing right
+            offset_x += offset
+        return offset_x, offset_y
