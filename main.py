@@ -61,6 +61,7 @@ class MyGame(arcade.Window):
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
 

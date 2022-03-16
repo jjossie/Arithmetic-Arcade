@@ -40,6 +40,29 @@ class BlockType(Enum):
     OPERATION = "crate_01"
 
 
+class BlockGroupPosition(Enum):
+    """
+    Stores the file suffixes for the images representing relative block positions.
+    So like left/right/standalone/middle. I don't know man just look at the values
+    """
+    LEFT = "leftend"
+    RIGHT = "rightend"
+    MIDDLE = "middle"
+    STANDALONE = "edit"
+
+
+class BlockType(Enum):
+    """
+    Determines whether the block is movable, immovable, correct, etc. Basically
+    the block's status.
+    """
+    MOVABLE = "crate_44"
+    IMMOVABLE = "crate_42"
+    CORRECT = "crate_45"
+    INCORRECT = "crate_43"
+    OPERATION = "crate_01"
+
+
 class NumberBlock(arcade.Sprite):
     """
     A sprite that draws itself as a crate with its stored value as a number on top.
@@ -60,9 +83,11 @@ class NumberBlock(arcade.Sprite):
         self.scale = TILE_SCALING
         self._hit_box_algorithm = "None"
         # Auxiliary sprites. One for the hitbox, another for the number/symbol.
-        self.player = None
-        self.hit_box_sprite = NumberBlockHitbox(self)
-
+        self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
+                                            scale=TILE_SCALING * 1.1,
+                                            hit_box_algorithm="None",  # This is important
+                                            center_x=self.center_x,
+                                            center_y=self.center_y)
         self.symbol_sprite = arcade.Sprite(self._get_symbol_path(),
                                            scale=NUMBER_SCALING,
                                            hit_box_algorithm="None")

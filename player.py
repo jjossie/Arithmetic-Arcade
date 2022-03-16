@@ -24,6 +24,7 @@ class Player(arcade.Sprite):
         self.up_pressed = False
         self.down_pressed = False
         self.space_pressed = False
+        self.shift_pressed = False
 
         self.orientation: PlayerOrientation = PlayerOrientation.DOWN
         self.block = None
@@ -64,14 +65,17 @@ class Player(arcade.Sprite):
         self.change_x = 0
         self.change_y = 0
 
+        speed = PLAYER_MOVEMENT_SPEED * PLAYER_RUN_MULTIPLIER\
+            if self.shift_pressed else PLAYER_MOVEMENT_SPEED
+
         if self.up_pressed and not self.down_pressed:
-            self.change_y = PLAYER_MOVEMENT_SPEED
+            self.change_y = speed
         elif self.down_pressed and not self.up_pressed:
-            self.change_y = -PLAYER_MOVEMENT_SPEED
+            self.change_y = -speed
         if self.left_pressed and not self.right_pressed:
-            self.change_x = -PLAYER_MOVEMENT_SPEED
+            self.change_x = -speed
         elif self.right_pressed and not self.left_pressed:
-            self.change_x = PLAYER_MOVEMENT_SPEED
+            self.change_x = speed
 
         # This does not allow the player go over
         if self.center_x < (VIEWPORT_MARGIN * 6 / 5):
@@ -108,6 +112,8 @@ class Player(arcade.Sprite):
             self.right_pressed = True
         elif key == arcade.key.SPACE:
             self.space_pressed = True
+        elif key == arcade.key.LSHIFT or key == arcade.key.RSHIFT:
+            self.shift_pressed = True
 
     def on_key_release(self, key, modifiers):
         """Called by the arcade.Window object when the user releases a key."""
@@ -122,6 +128,8 @@ class Player(arcade.Sprite):
             self.right_pressed = False
         elif key == arcade.key.SPACE:
             self.space_pressed = False
+        elif key == arcade.key.LSHIFT or key == arcade.key.RSHIFT:
+            self.shift_pressed = False
 
     def texture_update(self):
         """Textures changed by directions"""
