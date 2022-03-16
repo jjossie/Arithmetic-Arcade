@@ -62,6 +62,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
@@ -104,9 +105,7 @@ class MyGame(arcade.Window):
         self.caption()
 
     def on_update(self, delta_time):
-
         """Movement and game logic"""
-
         # Move the player with the physics engine
         self.physics_engine.update()
         self.player.update_player_speed()
