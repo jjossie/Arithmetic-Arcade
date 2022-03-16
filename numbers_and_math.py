@@ -4,7 +4,6 @@ import operator
 from enum import Enum
 
 from constant import *
-# from player import PlayerOrientation
 
 
 class NumberBlockHitbox(arcade.Sprite):
@@ -15,29 +14,6 @@ class NumberBlockHitbox(arcade.Sprite):
                          center_x=parent_block.center_x,
                          center_y=parent_block.center_y)
         self.parent_block = parent_block
-
-
-class BlockGroupPosition(Enum):
-    """
-    Stores the file suffixes for the images representing relative block positions.
-    So like left/right/standalone/middle. I don't know man just look at the values
-    """
-    LEFT = "leftend"
-    RIGHT = "rightend"
-    MIDDLE = "middle"
-    STANDALONE = "edit"
-
-
-class BlockType(Enum):
-    """
-    Determines whether the block is movable, immovable, correct, etc. Basically
-    the block's status.
-    """
-    MOVABLE = "crate_44"
-    IMMOVABLE = "crate_42"
-    CORRECT = "crate_45"
-    INCORRECT = "crate_43"
-    OPERATION = "crate_01"
 
 
 class BlockGroupPosition(Enum):
@@ -83,11 +59,7 @@ class NumberBlock(arcade.Sprite):
         self.scale = TILE_SCALING
         self._hit_box_algorithm = "None"
         # Auxiliary sprites. One for the hitbox, another for the number/symbol.
-        self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
-                                            scale=TILE_SCALING * 1.1,
-                                            hit_box_algorithm="None",  # This is important
-                                            center_x=self.center_x,
-                                            center_y=self.center_y)
+        self.hit_box_sprite = NumberBlockHitbox(self)
         self.symbol_sprite = arcade.Sprite(self._get_symbol_path(),
                                            scale=NUMBER_SCALING,
                                            hit_box_algorithm="None")
@@ -98,24 +70,6 @@ class NumberBlock(arcade.Sprite):
         scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX).append(self.hit_box_sprite)
         # And finally, add my symbol sprite list to that top layer
         scene.get_sprite_list(LAYER_NAME_NUMBER_SYMBOLS).append(self.symbol_sprite)
-
-    # def update_animation(self, delta_time: float = 1 / 60):
-        # Draw this block's numeric value on top of this sprite.
-        # p = self.player
-        # if p is not None:
-        #     # Determine the target coordinate relative to the player
-        #     offset = p.collision_radius / 2
-        #     if p.orientation == PlayerOrientation.UP:
-        #         target_x, target_y = p.center_x, p.top + offset
-        #     elif p.orientation == PlayerOrientation.DOWN:
-        #         target_x, target_y = p.center_x, p.bottom - offset
-        #     elif p.orientation == PlayerOrientation.LEFT:
-        #         target_x, target_y = p.left - offset, p.center_y
-        #     else:
-        #         # Assume facing right
-        #         target_x, target_y = p.right + offset, p.center_y
-        #
-        #     self.move_to(target_x, target_y)
 
     def move_to(self, x, y):
         """
@@ -130,14 +84,6 @@ class NumberBlock(arcade.Sprite):
         self.hit_box_sprite.center_y = y
         self.symbol_sprite.center_x = x
         self.symbol_sprite.center_y = y
-
-    def grab(self, player):
-        if self.block_type == BlockType.MOVABLE \
-                or self.block_type == BlockType.INCORRECT:
-            self.player = player
-
-    def release(self):
-        self.player = None
 
     def set_block_type(self, block_type: BlockType):
         self.block_type = block_type

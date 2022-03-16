@@ -3,7 +3,7 @@ from enum import Enum
 import arcade
 
 from constant import *
-from numbers_and_math import NumberBlock, BlockType
+from numbers_and_math import NumberBlock, BlockType, NumberBlockHitbox
 
 
 class PlayerOrientation(Enum):
@@ -52,6 +52,9 @@ class Player(arcade.Sprite):
         """
 
     def update(self):
+        """
+        Frame-by-frame logic for the player object. Called by window.on_update().
+        """
         self.update_player_speed()
         self.texture_update()
         self.check_for_block_collisions()
@@ -60,6 +63,9 @@ class Player(arcade.Sprite):
             self.release_block()
 
     def update_player_speed(self):
+        """
+        Calculates speed and moves the player based on which keys are pressed.
+        """
 
         # Calculate speed base on keys pressed
         self.change_x = 0
@@ -132,7 +138,7 @@ class Player(arcade.Sprite):
             self.shift_pressed = False
 
     def texture_update(self):
-        """Textures changed by directions"""
+        """Change the player's texture based on Orientation."""
 
         if self.up_pressed:
             self.orientation = PlayerOrientation.UP
@@ -145,18 +151,31 @@ class Player(arcade.Sprite):
         self.texture = PLAYER_TEXTURES[self.orientation.value]
 
     def grab_block(self, block: NumberBlock):
+        """
+        Grab a given NumberBlock if it is movable. This will set the
+        relative block offset at the moment the player grabbed it.
+        """
         if block.block_type == BlockType.MOVABLE \
                 or block.block_type == BlockType.INCORRECT:
             self.block = block
             self._block_position_offset = self._get_block_position_offset()
 
     def release_block(self):
+        """
+        Let go of whatever block the player is holding by setting self.block to None.
+        Called every time the space bar is released.
+        """
         self.block = None
 
     def check_for_block_collisions(self):
+        """
+        This is the function that checks if this (the player object) is colliding
+        with the hitboxes of any NumberBlocks. It also handles displaying the caption.
+        """
         if self.block is None:
             blocks = arcade.check_for_collision_with_list(self, self.window.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
             if len(blocks) != 0:
+                assert(isinstance(blocks[0], NumberBlockHitbox))
                 block = blocks[0].parent_block
                 # Make sure this block is actually a NumberBlock
                 assert(isinstance(block, NumberBlock))
@@ -166,6 +185,12 @@ class Player(arcade.Sprite):
                     self.window.caption()
 
     def _move_block(self):
+        """
+        Move the held block along with the player based on an offset relative
+        to the player's position.
+        This is called by self.update() every frame to ensure the block
+        the player is grabbing gets moved along with the player.
+        """
         if self.block is not None:
             self.block.move_to(
                 self.center_x + self._block_position_offset[0],
@@ -180,8 +205,6 @@ class Player(arcade.Sprite):
         assert(self.block is not None)
         offset_x = self.block.center_x - self.center_x
         offset_y = self.block.center_y - self.center_y
-        # offset = self.collision_radius * CHARACTER_SCALING
-        # offset = TILE_SIZE + self.collision_radius
         offset = 1
         if self.orientation == PlayerOrientation.UP:
             offset_y += offset
