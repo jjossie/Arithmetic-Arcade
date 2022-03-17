@@ -219,16 +219,16 @@ class VisualMathProblem:
 
         # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
-        self.lhs_target = TargetLocation(scene=self.scene, x=100)
+        # self.lhs_target = TargetLocation(scene=self.scene, x=100)
         
         self.operator = NumberBlockGroup(scene=self.scene, from_number=str(self.problem.operator))
-        self.operator_target = TargetLocation(scene=self.scene, x=400)
+        # self.operator_target = TargetLocation(scene=self.scene, x=400)
 
         self.rhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.rhs)
-        self.rhs_target = TargetLocation(scene=self.scene, x=700)
+        # self.rhs_target = TargetLocation(scene=self.scene, x=700)
         
         self.equals = NumberBlockGroup(scene=self.scene, from_number="=")
-        self.equals_target = TargetLocation(scene=self.scene, x=1000)
+        # self.equals_target = TargetLocation(scene=self.scene, x=1000)
 
         self.answer = NumberBlockGroup(scene=self.scene, from_number=self.problem.answer)
         self.answer_target = TargetLocation(scene=self.scene, x=1300)

@@ -1,5 +1,5 @@
 import arcade
-from numbers_and_math import TargetLocation, VisualMathProblem
+from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
 from math import sqrt
 from constant import *
@@ -75,7 +75,7 @@ class MyGame(arcade.Window):
         # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
 
         # Make a test math problem
-        self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
+        self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/2, 1, 10)
         self.problem.draw()
         self.problem.log()
         # TargetLocation(self.scene)
