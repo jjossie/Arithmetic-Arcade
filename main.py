@@ -18,20 +18,21 @@ VIEWPORT_MARGIN = 200
 CHARACTER_SCALING = 0.75
 TILE_SCALING = 1
 
-MAPS = [
+#MAPS = [
     # "maps/joel-demo.tmx",
     # "maps/Main-Spawn.tmx"
-     "maps/Urban-Area.tmx"
+    # "maps/Urban-Area.tmx"
     # "maps/Castle-Area.tmx"
     # "maps/Desert-Area.tmx"
     # "maps/Grass-Area.tmx"
-]
+#]
 
 PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
 
 LAYER_NAME_WALLS = "walls"
 LAYER_NAME_BACKGROUND = "background"
 LAYER_NAME_PLAYER = "player"
+LAYER_NAME_EXIT = "exits"
 
 PLAYER_TEXTURES = []
 
@@ -56,7 +57,7 @@ class MyGame(arcade.Window):
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_11.png"))
 
         # Separate variable that holds the player sprite
-        self.player_sprite = None
+        self.player = None
 
         self.left_pressed = False
         self.right_pressed = False
@@ -82,10 +83,10 @@ class MyGame(arcade.Window):
         Then the player sprite can be loaded and added to the scene afterward so that they draw
         in the proper order.
         """
-
+        map_name = "maps/Main-Spawn.tmx"
         # Load the Tiled Map
         layer_options = {}
-        self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
+        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
@@ -99,7 +100,7 @@ class MyGame(arcade.Window):
         self.player_sprite.center_x = 927
         self.player_sprite.center_y = 900
         # self.player_list.append(self.player_sprite)
-        self.scene.add_sprite("Player", self.player_sprite)
+        #self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
         #self.scene.add_sprite("castle", self.castle_sprite)
 
@@ -125,11 +126,33 @@ class MyGame(arcade.Window):
         # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player_sprite, self.scene.get_sprite_list(LAYER_NAME_WALLS),
+            self.player, self.scene.get_sprite_list(LAYER_NAME_WALLS),
         )
 
-    #def load_new_level(self):
+    #def trigger-new-level has to be called from update.
+    def player_hit_door(self):
+        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
 
+        
+    
+    
+    def load_new_level(self):
+     #   layer_options = {}
+      #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
+       # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
+       
+        if self.level == 1 :
+           self.level += 1
+        if self.level == 2:
+            self.level+= 1
+        if self.level == 3:
+            self.level += 1
+
+
+        if self.player == exit and self.level == 1:
+            self.player == 2
+            self.player += 1 
+        
     def on_draw(self):
         """Render the screen."""
 
@@ -194,6 +217,11 @@ class MyGame(arcade.Window):
         # Move the player with the physics engine
         self.physics_engine.update()
         self.texture_update()
+        self.load_new_level
+        self.player_hit_door
+
+        #self.load_new_level()
+        #check for exit collision thie is call setup for new levels
         #if self.player_sprite.center_x >= self.end_of_map:
          #   self.level += 1
 
