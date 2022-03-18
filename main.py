@@ -1,5 +1,5 @@
 import arcade
-from numbers_and_math import VisualMathProblem
+from numbers_and_math import VisualMathProblem, NumberBlock
 from pyglet.math import Vec2
 from math import sqrt
 from constant import *
@@ -61,6 +61,7 @@ class MyGame(arcade.Window):
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
 
         # self.player_list.append(self.player_sprite)
@@ -77,8 +78,7 @@ class MyGame(arcade.Window):
         # Make a test math problem
         self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/2, 1, 10)
         self.problem.draw()
-        self.problem.log()
-        # TargetLocation(self.scene)
+        # self.problem.log()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -110,9 +110,8 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
-        self.player.update_player_speed()
-        self.player.texture_update()
-        self.player_hit_number()
+        # Update the player object
+        self.player.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
@@ -120,31 +119,17 @@ class MyGame(arcade.Window):
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
 
-    def player_hit_number(self):
-        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
-        if len(collisions) != 0:
-            return True
-        return False
-
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
         cap = "Press Space to lift it up"
 
-        if self.player_hit_number():
-            arcade.draw_text(
-                cap,
-                self.view_left + SCREEN_WIDTH * 0.3,
-                self.view_bottom + SCREEN_HEIGHT * 0.8,
-                arcade.csscolor.WHITE,
-                30, )
-        else:
-            arcade.draw_text(
-                " ",
-                0,
-                0,
-                arcade.csscolor.WHITE,
-                18, )
+        arcade.draw_text(
+            cap,
+            self.view_left + SCREEN_WIDTH * 0.3,
+            self.view_bottom + SCREEN_HEIGHT * 0.8,
+            arcade.csscolor.WHITE,
+            30, )
 
     def scroll_to_player(self):
 
