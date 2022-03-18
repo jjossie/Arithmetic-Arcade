@@ -59,6 +59,7 @@ class MyGame(arcade.Window):
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
         # repeat line 91 and line 88
         # Create the Sprite lists
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)

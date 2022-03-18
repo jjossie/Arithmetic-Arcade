@@ -19,7 +19,7 @@ class TargetLocation(arcade.Sprite):
         # self.center_y = y
         self.scale = TILE_SCALING * 0.5
         self.expected_value = expected_value
-        scene.get_sprite_list(LAYER_NAME_NUMBER).append(self)
+        scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS).append(self)
 
     def move_to(self, x, y):
         """
