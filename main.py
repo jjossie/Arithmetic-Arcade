@@ -1,5 +1,5 @@
 import arcade
-from numbers_and_math import VisualMathProblem
+from numbers_and_math import VisualMathProblem, NumberBlock
 from pyglet.math import Vec2
 from math import sqrt
 from constant import *
@@ -63,6 +63,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
@@ -78,7 +79,7 @@ class MyGame(arcade.Window):
         # Make a test math problem
         self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
         self.problem.draw()
-        self.problem.log()
+        # self.problem.log()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -105,14 +106,11 @@ class MyGame(arcade.Window):
         self.caption()
 
     def on_update(self, delta_time):
-
-        """Movement and game logic"""
-
+        """Movement and game logic."""
         # Move the player with the physics engine
         self.physics_engine.update()
-        self.player.update_player_speed()
-        self.player.texture_update()
-        self.player_hit_number()
+        # Update the player object
+        self.player.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
@@ -120,44 +118,17 @@ class MyGame(arcade.Window):
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
 
-    def player_hit_number(self):
-        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
-        if len(collisions) != 0:
-            return True
-        return False
-
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
-        show_caption = False
         cap = "Press Space to lift it up"
 
-        # left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
-        #         self.problem.lhs.center_y - self.player.center_y) ** 2)
-        # right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
-        #         self.problem.rhs.center_y - self.player.center_y) ** 2)
-        #
-        # if left_distance < 55:
-        #     show_caption = True
-        # elif right_distance < 55:
-        #     show_caption = True
-        # else:
-        #     show_caption = False
-
-        if self.player_hit_number():
-            arcade.draw_text(
-                cap,
-                self.view_left + SCREEN_WIDTH * 0.3,
-                self.view_bottom + SCREEN_HEIGHT * 0.8,
-                arcade.csscolor.WHITE,
-                30, )
-        else:
-            arcade.draw_text(
-                " ",
-                0,
-                0,
-                arcade.csscolor.WHITE,
-                18, )
+        arcade.draw_text(
+            cap,
+            self.view_left + SCREEN_WIDTH * 0.3,
+            self.view_bottom + SCREEN_HEIGHT * 0.8,
+            arcade.csscolor.WHITE,
+            30, )
 
     def scroll_to_player(self):
 

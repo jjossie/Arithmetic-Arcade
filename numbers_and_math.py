@@ -2,9 +2,18 @@ import arcade
 import random
 import operator
 from enum import Enum
-# from dataclasses import dataclass
 
 from constant import *
+
+
+class NumberBlockHitbox(arcade.Sprite):
+    def __init__(self, parent_block):
+        super().__init__(TRANSPARENT_BOX_PATH,
+                         scale=TILE_SCALING * 1.1,
+                         hit_box_algorithm="None",  # This is important
+                         center_x=parent_block.center_x,
+                         center_y=parent_block.center_y)
+        self.parent_block = parent_block
 
 
 class BlockGroupPosition(Enum):
@@ -50,11 +59,7 @@ class NumberBlock(arcade.Sprite):
         self.scale = TILE_SCALING
         self._hit_box_algorithm = "None"
         # Auxiliary sprites. One for the hitbox, another for the number/symbol.
-        self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
-                                            scale=TILE_SCALING * 1.1,
-                                            hit_box_algorithm="None",  # This is important
-                                            center_x=self.center_x,
-                                            center_y=self.center_y)
+        self.hit_box_sprite = NumberBlockHitbox(self)
         self.symbol_sprite = arcade.Sprite(self._get_symbol_path(),
                                            scale=NUMBER_SCALING,
                                            hit_box_algorithm="None")
@@ -65,23 +70,6 @@ class NumberBlock(arcade.Sprite):
         scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX).append(self.hit_box_sprite)
         # And finally, add my symbol sprite list to that top layer
         scene.get_sprite_list(LAYER_NAME_NUMBER_SYMBOLS).append(self.symbol_sprite)
-
-    def update_animation(self, delta_time: float = 1 / 60):
-        # Draw this block's numeric value on top of this sprite.
-        # arcade.draw_text(
-        #     f"{self.value}",
-        #     start_x=self.center_x,
-        #     start_y=self.center_y,
-        #     color=arcade.color.WHITE,
-        #     font_size=18 * TILE_SCALING,
-        #     width=int(self.width),
-        #     align="center",
-        #     font_name="calibri",
-        #     bold=True,
-        #     anchor_x="center",
-        #     anchor_y="center",
-        # )
-        pass
 
     def move_to(self, x, y):
         """
