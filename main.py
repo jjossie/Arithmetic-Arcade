@@ -63,7 +63,6 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
-        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
@@ -77,7 +76,7 @@ class MyGame(arcade.Window):
         # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
 
         # Make a test math problem
-        self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
+        self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/2, 1, 10)
         self.problem.draw()
         # self.problem.log()
 
@@ -106,7 +105,9 @@ class MyGame(arcade.Window):
         self.caption()
 
     def on_update(self, delta_time):
-        """Movement and game logic."""
+
+        """Movement and game logic"""
+
         # Move the player with the physics engine
         self.physics_engine.update()
         # Update the player object

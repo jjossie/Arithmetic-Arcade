@@ -1,3 +1,4 @@
+from re import S
 import arcade
 import random
 import operator
@@ -5,6 +6,22 @@ from enum import Enum
 
 from constant import *
 
+class TargetLocation(arcade.Sprite):
+    """
+    A sprite that draws the target locations
+    """
+    def __init__(self, scene, x):
+        super().__init__()
+        
+        self.texture = arcade.load_texture(TARGET_BOX)
+        self.center_x = x
+        self.center_y = 500
+        self.scale = TILE_SCALING*0.5
+        
+        scene.get_sprite_list(LAYER_NAME_NUMBER).append(self)   
+        
+        
+    
 
 class NumberBlockHitbox(arcade.Sprite):
     def __init__(self, parent_block):
@@ -292,10 +309,20 @@ class VisualMathProblem:
 
         # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
+        # self.lhs_target = TargetLocation(scene=self.scene, x=100)
+        
         self.operator = NumberBlockGroup(scene=self.scene, from_number=str(self.problem.operator))
+        # self.operator_target = TargetLocation(scene=self.scene, x=400)
+
         self.rhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.rhs)
+        # self.rhs_target = TargetLocation(scene=self.scene, x=700)
+        
         self.equals = NumberBlockGroup(scene=self.scene, from_number="=")
+        # self.equals_target = TargetLocation(scene=self.scene, x=1000)
+
         self.answer = NumberBlockGroup(scene=self.scene, from_number=self.problem.answer)
+        self.answer_target = TargetLocation(scene=self.scene, x=1300)
+
 
         # Configure The Problem
         self.lhs.set_block_type(BlockType.IMMOVABLE)
