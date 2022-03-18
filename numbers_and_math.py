@@ -1,4 +1,3 @@
-from re import S
 import arcade
 import random
 import operator
@@ -6,22 +5,31 @@ from enum import Enum
 
 from constant import *
 
+
 class TargetLocation(arcade.Sprite):
     """
     A sprite that draws the target locations
     """
-    def __init__(self, scene, x):
+
+    def __init__(self, scene, expected_value):
         super().__init__()
-        
+
         self.texture = arcade.load_texture(TARGET_BOX)
+        # self.center_x = x
+        # self.center_y = y
+        self.scale = TILE_SCALING * 0.5
+        self.expected_value = expected_value
+        scene.get_sprite_list(LAYER_NAME_NUMBER).append(self)
+
+    def move_to(self, x, y):
+        """
+        Use this to move a TargetLocation rather than setting center_x and center_y directly.
+        This also exists for the purpose of polymorphism - to be synonymous with NumberBlockGroup,
+        which has the same function.
+        """
         self.center_x = x
-        self.center_y = 500
-        self.scale = TILE_SCALING*0.5
-        
-        scene.get_sprite_list(LAYER_NAME_NUMBER).append(self)   
-        
-        
-    
+        self.center_y = y
+
 
 class NumberBlockHitbox(arcade.Sprite):
     def __init__(self, parent_block):
@@ -138,14 +146,17 @@ class NumberBlock(arcade.Sprite):
 
 class NumberBlockGroup:
     """
-    One or more (probably up to 3) NumberBlocks that represent a single value.
+    One or more (probably up to 3) Blocks that represent a single value.
+    Will be made out of NumberBlocks (which are movable) by default, but
+    can also be made as TargetLocations.
     """
 
-    def __init__(self, scene=None, x=0, y=0, blocks=None, from_number=None):
+    def __init__(self, block_template=NumberBlock, scene=None, x=0, y=0, blocks=None, from_number=None):
         assert (scene is not None)
         self.scene = scene
         self.center_x = x
         self.center_y = y
+        self.block_template = block_template
         if from_number is None:
             self._blocks = blocks
             self.value = self._compute_value()
@@ -170,13 +181,13 @@ class NumberBlockGroup:
         temp_val = self.value
 
         if isinstance(temp_val, str):
-            blocks.append(NumberBlock(self.scene, temp_val))
+            blocks.append(self.block_template(self.scene, temp_val))
         else:
             finished = False
             multiplier = 1
             while not finished:
                 single_digit = int(((temp_val % (multiplier * 10)) - (temp_val % multiplier)) / multiplier)
-                blocks.insert(0, NumberBlock(self.scene, single_digit))
+                blocks.insert(0, self.block_template(self.scene, single_digit))
                 multiplier *= 10
                 if temp_val // multiplier == 0:
                     finished = True
@@ -210,21 +221,24 @@ class NumberBlockGroup:
         Updates the block_group_position property of each NumberBlock in the group
         so they appear as a single number rather than separate digits.
         """
-        for index, block in enumerate(self._blocks):
-            size = self.get_size()
-            if size == 1:
-                block.set_block_group_position(BlockGroupPosition.STANDALONE)
-            else:
-                if index == 0:
-                    block.set_block_group_position(BlockGroupPosition.LEFT)
-                elif index == size - 1:
-                    block.set_block_group_position(BlockGroupPosition.RIGHT)
+        if self.block_template == NumberBlock:
+            print("updating textures ")
+            for index, block in enumerate(self._blocks):
+                size = self.get_size()
+                if size == 1:
+                    block.set_block_group_position(BlockGroupPosition.STANDALONE)
                 else:
-                    block.set_block_group_position(BlockGroupPosition.MIDDLE)
+                    if index == 0:
+                        block.set_block_group_position(BlockGroupPosition.LEFT)
+                    elif index == size - 1:
+                        block.set_block_group_position(BlockGroupPosition.RIGHT)
+                    else:
+                        block.set_block_group_position(BlockGroupPosition.MIDDLE)
 
     def set_block_type(self, block_type: BlockType):
-        for block in self._blocks:
-            block.set_block_type(block_type)
+        if self.block_template == NumberBlock:
+            for block in self._blocks:
+                block.set_block_type(block_type)
 
     def move_to(self, x, y):
         """
@@ -310,28 +324,28 @@ class VisualMathProblem:
         # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
         # self.lhs_target = TargetLocation(scene=self.scene, x=100)
-        
+
         self.operator = NumberBlockGroup(scene=self.scene, from_number=str(self.problem.operator))
         # self.operator_target = TargetLocation(scene=self.scene, x=400)
 
         self.rhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.rhs)
         # self.rhs_target = TargetLocation(scene=self.scene, x=700)
-        
+
         self.equals = NumberBlockGroup(scene=self.scene, from_number="=")
         # self.equals_target = TargetLocation(scene=self.scene, x=1000)
 
-        self.answer = NumberBlockGroup(scene=self.scene, from_number=self.problem.answer)
-        self.answer_target = TargetLocation(scene=self.scene, x=1300)
-
+        self.answer_target = NumberBlockGroup(block_template=TargetLocation, scene=self.scene,
+                                              from_number=self.problem.answer)
+        # self.answer_target = TargetLocation(scene=self.scene, x=1300)
 
         # Configure The Problem
         self.lhs.set_block_type(BlockType.IMMOVABLE)
         self.rhs.set_block_type(BlockType.IMMOVABLE)
         self.operator.set_block_type(BlockType.OPERATION)
         self.equals.set_block_type(BlockType.OPERATION)
-        self.answer.set_block_type(BlockType.MOVABLE)
+        # self.answer_target.set_block_type(BlockType.MOVABLE)
 
-        self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer]
+        self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
 
     def draw(self):
         x = self.center_x
