@@ -30,6 +30,7 @@ LAYER_NAME_PLAYER = "player"
 LAYER_NAME_NUMBER = "Numbers"
 LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
+LAYER_NAME_EXIT = "exits"
 
 PLAYER_TEXTURES = []
 IMG_PATH_EXT = ".png"

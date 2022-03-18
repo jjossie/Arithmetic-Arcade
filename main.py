@@ -88,18 +88,21 @@ class MyGame(arcade.Window):
             ]
         )
 
-    #def trigger-new-level has to be called from update.
     def player_hit_door(self):
         collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
-
+        if len(collisions) > 0:
+            print("we hit a door")
 
 
 
     def load_new_level(self):
+        """
+        load_new_level() has to be called from update.
+        """
+
      #   layer_options = {}
       #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
        # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
-
         if self.level == 1 :
            self.level += 1
         if self.level == 2:
@@ -134,7 +137,7 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
-        self.texture_update()
+        # self.texture_update()
         self.load_new_level
         self.player_hit_door
 
