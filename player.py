@@ -84,26 +84,26 @@ class Player(arcade.Sprite):
             self.change_x = speed
 
         # This does not allow the player go over
-        if self.center_x < (VIEWPORT_MARGIN * 6 / 5):
-            if self.center_x <= (VIEWPORT_MARGIN / 10):
-                self.center_x = (VIEWPORT_MARGIN / 10)
-        else:
-            self.window.scroll_to_player()
-        if self.center_y < (VIEWPORT_MARGIN * 1.2):
-            if self.center_y <= (VIEWPORT_MARGIN / 10):
-                self.center_y = (VIEWPORT_MARGIN / 10)
-        else:
-            self.window.scroll_to_player()
-        if self.center_x > (MAP_SIZE - VIEWPORT_MARGIN * 0.8):
-            if self.center_x >= (MAP_SIZE + 20):
-                self.center_x = (MAP_SIZE + 20)
-        else:
-            self.window.scroll_to_player()
-        if self.center_y > (MAP_SIZE - VIEWPORT_MARGIN * 0.8):
-            if self.center_y >= (MAP_SIZE + VIEWPORT_MARGIN / 5):
-                self.center_y = (MAP_SIZE + VIEWPORT_MARGIN / 5)
-        else:
-            self.window.scroll_to_player()
+        # if self.center_x < (VIEWPORT_MARGIN * 6 / 5):
+        #     if self.center_x <= (VIEWPORT_MARGIN / 10):
+        #         self.center_x = (VIEWPORT_MARGIN / 10)
+        # else:
+        #     self.window.scroll_to_player()
+        # if self.center_y < (VIEWPORT_MARGIN * 1.2):
+        #     if self.center_y <= (VIEWPORT_MARGIN / 10):
+        #         self.center_y = (VIEWPORT_MARGIN / 10)
+        # else:
+        #     self.window.scroll_to_player()
+        # if self.center_x > (MAP_SIZE - VIEWPORT_MARGIN * 0.8):
+        #     if self.center_x >= (MAP_SIZE + 20):
+        #         self.center_x = (MAP_SIZE + 20)
+        # else:
+        #     self.window.scroll_to_player()
+        # if self.center_y > (MAP_SIZE - VIEWPORT_MARGIN * 0.8):
+        #     if self.center_y >= (MAP_SIZE + VIEWPORT_MARGIN / 5):
+        #         self.center_y = (MAP_SIZE + VIEWPORT_MARGIN / 5)
+        # else:
+        self.window.scroll_to_player()
 
     def on_key_press(self, key, modifiers):
         """Called by the arcade.Window object whenever a key is pressed."""
