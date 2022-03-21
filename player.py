@@ -197,6 +197,9 @@ class Player(arcade.Sprite):
                 self.center_y + self._block_position_offset[1]
             )
 
+            self.block.auto_move()
+
+
     def _get_block_position_offset(self):
         """
         Determine the position offset for the block relative to the player for

@@ -148,6 +148,7 @@ class MyGame(arcade.Window):
          #   self.level += 1
         # Update the player object
         self.player.update()
+        
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)

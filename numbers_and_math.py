@@ -48,6 +48,7 @@ class NumberBlock(arcade.Sprite):
         super().__init__()
         assert (value is not None and scene is not None)
         self.value = value
+        self.scene = scene
 
         # This determines whether it is movable, immovable, etc.
         self.block_type = BlockType.MOVABLE
@@ -84,6 +85,13 @@ class NumberBlock(arcade.Sprite):
         self.hit_box_sprite.center_y = y
         self.symbol_sprite.center_x = x
         self.symbol_sprite.center_y = y
+
+    def auto_move(self):
+        auto = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
+        if len(auto) != 0:
+            self.move_to(auto[0].center_x,auto[0].center_y)
+            print("auto")
+
 
     def set_block_type(self, block_type: BlockType):
         self.block_type = block_type
@@ -257,17 +265,6 @@ class TargetLocation(arcade.Sprite):
         self.center_y = y
 
 
-class MovableBlocks(NumberBlockGroup):
-    """
-    Those are the blocks that are able to be moved.
-    """
-    
-    def __init__(self, block_template=NumberBlock, scene=None, x=0, y=0, blocks=None, from_number=None):
-        super().__init__(block_template, scene, x, y, blocks, from_number)
-
-    def auto_move(self):
-        pass
-
 
 class SimpleMathProblem:
     """
@@ -346,8 +343,8 @@ class VisualMathProblem:
 
         self.movable_blocks = []
         for i in range(0,10):
-            self.movable_blocks.append(MovableBlocks(scene=self.scene, from_number=i))
-            self.movable_blocks.append(MovableBlocks(scene=self.scene, from_number=i))
+            self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
+            self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
 
         self.answer_target = NumberBlockGroup(block_template=TargetLocation, scene=self.scene,
                                               from_number=self.problem.answer)
