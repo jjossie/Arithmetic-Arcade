@@ -89,7 +89,9 @@ class NumberBlock(arcade.Sprite):
     def auto_move(self):
         auto = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
         if len(auto) != 0:
-            self.move_to(auto[0].center_x,auto[0].center_y)
+            assert(isinstance(auto[0], TargetLocation))
+            target: TargetLocation = auto[0]
+            target.place_number_block(self)
             print("auto")
 
 
