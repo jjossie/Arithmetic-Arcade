@@ -6,31 +6,6 @@ from enum import Enum
 from constant import *
 
 
-class TargetLocation(arcade.Sprite):
-    """
-    A sprite that draws the target locations
-    """
-
-    def __init__(self, scene, expected_value):
-        super().__init__()
-
-        self.texture = arcade.load_texture(TARGET_BOX)
-        # self.center_x = x
-        # self.center_y = y
-        self.scale = TILE_SCALING * 0.5
-        self.expected_value = expected_value
-        scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS).append(self)
-
-    def move_to(self, x, y):
-        """
-        Use this to move a TargetLocation rather than setting center_x and center_y directly.
-        This also exists for the purpose of polymorphism - to be synonymous with NumberBlockGroup,
-        which has the same function.
-        """
-        self.center_x = x
-        self.center_y = y
-
-
 class NumberBlockHitbox(arcade.Sprite):
     def __init__(self, parent_block):
         super().__init__(TRANSPARENT_BOX_PATH,
@@ -259,6 +234,41 @@ class NumberBlockGroup:
             print(str(block))
 
 
+class TargetLocation(arcade.Sprite):
+    """
+    A sprite that draws the target locations
+    """
+
+    def __init__(self, scene, expected_value):
+        super().__init__()
+
+        self.texture = arcade.load_texture(TARGET_BOX)
+        self.scale = TILE_SCALING * 0.5
+        self.expected_value = expected_value
+        scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS).append(self)
+
+    def move_to(self, x, y):
+        """
+        Use this to move a TargetLocation rather than setting center_x and center_y directly.
+        This also exists for the purpose of polymorphism - to be synonymous with NumberBlockGroup,
+        which has the same function.
+        """
+        self.center_x = x
+        self.center_y = y
+
+
+class MovableBlocks(NumberBlockGroup):
+    """
+    Those are the blocks that are able to be moved.
+    """
+    
+    def __init__(self, block_template=NumberBlock, scene=None, x=0, y=0, blocks=None, from_number=None):
+        super().__init__(block_template, scene, x, y, blocks, from_number)
+
+    def auto_move(self):
+        pass
+
+
 class SimpleMathProblem:
     """
     Represents a math problem consisting of two operands - lhs and rhs (left-hand side
@@ -334,8 +344,14 @@ class VisualMathProblem:
         self.equals = NumberBlockGroup(scene=self.scene, from_number="=")
         # self.equals_target = TargetLocation(scene=self.scene, x=1000)
 
+        self.movable_blocks = []
+        for i in range(0,10):
+            self.movable_blocks.append(MovableBlocks(scene=self.scene, from_number=i))
+            self.movable_blocks.append(MovableBlocks(scene=self.scene, from_number=i))
+
         self.answer_target = NumberBlockGroup(block_template=TargetLocation, scene=self.scene,
                                               from_number=self.problem.answer)
+        #self.answer_target = TargetLocation(scene=self.scene, from_number=self.problem.answer)
         # self.answer_target = TargetLocation(scene=self.scene, x=1300)
 
         # Configure The Problem
@@ -343,9 +359,13 @@ class VisualMathProblem:
         self.rhs.set_block_type(BlockType.IMMOVABLE)
         self.operator.set_block_type(BlockType.OPERATION)
         self.equals.set_block_type(BlockType.OPERATION)
+        for block in self.movable_blocks:
+            block.set_block_type(BlockType.MOVABLE)
         # self.answer_target.set_block_type(BlockType.MOVABLE)
 
         self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
+
+
 
     def draw(self):
         x = self.center_x
@@ -357,6 +377,9 @@ class VisualMathProblem:
 
             # Move over to the next space
             x += space * size + space
+
+        for block in self.movable_blocks:
+            block.move_to(random.randint(100,1500),random.randint(600,1500))
 
     def log(self):
         for block in self.draw_order:
