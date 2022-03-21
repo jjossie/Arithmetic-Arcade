@@ -9,7 +9,7 @@ from constant import *
 class NumberBlockHitbox(arcade.Sprite):
     def __init__(self, parent_block):
         super().__init__(TRANSPARENT_BOX_PATH,
-                         scale=TILE_SCALING * 1.1,
+                         scale=NUMBER_BLOCK_SCALING * 1.1,
                          hit_box_algorithm="None",  # This is important
                          center_x=parent_block.center_x,
                          center_y=parent_block.center_y)
@@ -56,7 +56,7 @@ class NumberBlock(arcade.Sprite):
         self.configure_texture()
 
         self.texture = arcade.load_texture(CRATE_BLUE_PATH)
-        self.scale = TILE_SCALING
+        self.scale = NUMBER_BLOCK_SCALING
         self._hit_box_algorithm = "None"
         # Auxiliary sprites. One for the hitbox, another for the number/symbol.
         self.hit_box_sprite = NumberBlockHitbox(self)
@@ -188,7 +188,7 @@ class NumberBlockGroup:
         next to each other properly.
         """
         for index, block in enumerate(self._blocks):
-            offset = index * TILE_SIZE * TILE_SCALING * 2
+            offset = index * TILE_SIZE * TILE_SCALING
             block.move_to(self.center_x + offset, self.center_y)
 
     def _update_textures(self):
@@ -243,7 +243,7 @@ class TargetLocation(arcade.Sprite):
         super().__init__()
 
         self.texture = arcade.load_texture(TARGET_BOX)
-        self.scale = TILE_SCALING * 0.5
+        self.scale = NUMBER_BLOCK_SCALING
         self.expected_value = expected_value
         scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS).append(self)
 
@@ -370,7 +370,7 @@ class VisualMathProblem:
     def draw(self):
         x = self.center_x
         y = self.center_y
-        space = TILE_SIZE * TILE_SCALING * 2
+        space = TILE_SIZE * TILE_SCALING
         for chunk in self.draw_order:
             size = chunk.get_size()
             chunk.move_to(x, y)
