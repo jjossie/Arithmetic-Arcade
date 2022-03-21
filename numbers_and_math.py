@@ -253,6 +253,7 @@ class TargetLocation(arcade.Sprite):
         self.texture = arcade.load_texture(TARGET_BOX)
         self.scale = NUMBER_BLOCK_SCALING
         self.expected_value = expected_value
+        self.number_attempt = None
         scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS).append(self)
 
     def move_to(self, x, y):
@@ -264,6 +265,19 @@ class TargetLocation(arcade.Sprite):
         self.center_x = x
         self.center_y = y
 
+    def place_number_block(self, block: NumberBlock):
+        # Try to snap in the NumberBlock
+        if self.number_attempt is None:
+            block.move_to(self.center_x, self.center_y)
+            self.number_attempt = block
+
+            # Check if the player got the answer right
+            if self.number_attempt.value == self.expected_value:
+                self.number_attempt.set_block_type(BlockType.CORRECT)
+            else:
+                self.number_attempt.set_block_type(BlockType.INCORRECT)
+        else:
+            pass
 
 
 class SimpleMathProblem:
