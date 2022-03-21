@@ -50,14 +50,14 @@ class MyGame(arcade.Window):
         Then the player sprite can be loaded and added to the scene afterward so that they draw
         in the proper order.
         """
-
+        map_name = "maps/Main-Spawn.tmx"
         # Load the Tiled Map
         layer_options = {}
         self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        # repeat line 91 and line 88
+        #repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
@@ -68,7 +68,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
-        # self.scene.add_sprite("castle", self.castle_sprite)
+        #self.scene.add_sprite("castle", self.castle_sprite)
 
         # map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
         # my_map = arcade.tilemap.read_tmx(map_name)
@@ -87,6 +87,33 @@ class MyGame(arcade.Window):
                 self.scene.get_sprite_list(LAYER_NAME_NUMBER)
             ]
         )
+
+    def player_hit_door(self):
+        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
+        if len(collisions) > 0:
+            print("we hit a door")
+
+
+
+    def load_new_level(self):
+        """
+        load_new_level() has to be called from update.
+        """
+
+     #   layer_options = {}
+      #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
+       # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
+        if self.level == 1 :
+           self.level += 1
+        if self.level == 2:
+            self.level+= 1
+        if self.level == 3:
+            self.level += 1
+
+
+        if self.player == exit and self.level == 1:
+            self.player == 2
+            self.player += 1
 
     def on_draw(self):
         """Render the screen."""
@@ -110,6 +137,14 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+        # self.texture_update()
+        self.load_new_level
+        self.player_hit_door
+
+        #self.load_new_level()
+        #check for exit collision thie is call setup for new levels
+        #if self.player_sprite.center_x >= self.end_of_map:
+         #   self.level += 1
         # Update the player object
         self.player.update()
 
