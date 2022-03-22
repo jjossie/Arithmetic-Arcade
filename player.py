@@ -59,7 +59,7 @@ class Player(arcade.Sprite):
         self.texture_update()
         self.check_for_block_collisions()
         self._move_block()
-        if not self.space_pressed:
+        if self.block is not None and not self.space_pressed:
             self.release_block()
 
     def update_player_speed(self):
@@ -71,7 +71,7 @@ class Player(arcade.Sprite):
         self.change_x = 0
         self.change_y = 0
 
-        speed = PLAYER_MOVEMENT_SPEED * PLAYER_RUN_MULTIPLIER\
+        speed = PLAYER_MOVEMENT_SPEED * PLAYER_RUN_MULTIPLIER \
             if self.shift_pressed else PLAYER_MOVEMENT_SPEED
 
         if self.up_pressed and not self.down_pressed:
@@ -165,6 +165,10 @@ class Player(arcade.Sprite):
         Let go of whatever block the player is holding by setting self.block to None.
         Called every time the space bar is released.
         """
+        # Moved the call to NumberBlock.auto_move() here instead of inside move_block.
+        # This makes it so the player only drops off the block once the space bar is released.
+        # Reduces the amount of collision checking that has to happen which should improve performance.
+        self.block.auto_move()
         self.block = None
 
     def check_for_block_collisions(self):
@@ -173,12 +177,13 @@ class Player(arcade.Sprite):
         with the hitboxes of any NumberBlocks. It also handles displaying the caption.
         """
         if self.block is None:
-            blocks = arcade.check_for_collision_with_list(self, self.window.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
+            blocks = arcade.check_for_collision_with_list(self,
+                                                          self.window.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
             if len(blocks) != 0:
-                assert(isinstance(blocks[0], NumberBlockHitbox))
+                assert (isinstance(blocks[0], NumberBlockHitbox))
                 block = blocks[0].parent_block
                 # Make sure this block is actually a NumberBlock
-                assert(isinstance(block, NumberBlock))
+                assert (isinstance(block, NumberBlock))
                 if self.space_pressed:
                     self.grab_block(block)
                 else:
@@ -197,15 +202,12 @@ class Player(arcade.Sprite):
                 self.center_y + self._block_position_offset[1]
             )
 
-            self.block.auto_move()
-
-
     def _get_block_position_offset(self):
         """
         Determine the position offset for the block relative to the player for
         a given instant in time.
         """
-        assert(self.block is not None)
+        assert (self.block is not None)
         offset_x = self.block.center_x - self.center_x
         offset_y = self.block.center_y - self.center_y
         offset = 1

@@ -55,10 +55,10 @@ class NumberBlock(arcade.Sprite):
         # This determines whether it is a left, right, middle, or standalone block.
         self.block_group_position: BlockGroupPosition = BlockGroupPosition.STANDALONE
         self.configure_texture()
-
-        self.texture = arcade.load_texture(CRATE_BLUE_PATH)
         self.scale = NUMBER_BLOCK_SCALING
         self._hit_box_algorithm = "None"
+        # A reference to a TargetLocation that this block might be placed on
+        self.target_location = None
         # Auxiliary sprites. One for the hitbox, another for the number/symbol.
         self.hit_box_sprite = NumberBlockHitbox(self)
         self.symbol_sprite = arcade.Sprite(self._get_symbol_path(),
@@ -88,12 +88,14 @@ class NumberBlock(arcade.Sprite):
 
     def auto_move(self):
         auto = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
-        if len(auto) != 0:
-            assert(isinstance(auto[0], TargetLocation))
+        if len(auto) != 0:  # Player dropped the block on top of a Target Location
+            assert (isinstance(auto[0], TargetLocation))
             target: TargetLocation = auto[0]
+            self.target_location = target
             target.place_number_block(self)
-            print("auto")
-
+        else:  # Player dropped the block out in the open
+            if self.target_location is not None:
+                self.target_location.clear_number_block()
 
     def set_block_type(self, block_type: BlockType):
         self.block_type = block_type
@@ -277,9 +279,13 @@ class TargetLocation(arcade.Sprite):
             if self.number_attempt.value == self.expected_value:
                 self.number_attempt.set_block_type(BlockType.CORRECT)
             else:
+                # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
                 self.number_attempt.set_block_type(BlockType.INCORRECT)
         else:
             pass
+
+    def clear_number_block(self):
+        self.number_attempt = None
 
 
 class SimpleMathProblem:
@@ -358,14 +364,12 @@ class VisualMathProblem:
         # self.equals_target = TargetLocation(scene=self.scene, x=1000)
 
         self.movable_blocks = []
-        for i in range(0,10):
+        for i in range(0, 10):
             self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
             self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
 
         self.answer_target = NumberBlockGroup(block_template=TargetLocation, scene=self.scene,
                                               from_number=self.problem.answer)
-        #self.answer_target = TargetLocation(scene=self.scene, from_number=self.problem.answer)
-        # self.answer_target = TargetLocation(scene=self.scene, x=1300)
 
         # Configure The Problem
         self.lhs.set_block_type(BlockType.IMMOVABLE)
@@ -377,8 +381,6 @@ class VisualMathProblem:
         # self.answer_target.set_block_type(BlockType.MOVABLE)
 
         self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
-
-
 
     def draw(self):
         x = self.center_x
@@ -392,7 +394,7 @@ class VisualMathProblem:
             x += space * size + space
 
         for block in self.movable_blocks:
-            block.move_to(random.randint(100,1500),random.randint(600,1500))
+            block.move_to(random.randint(100, 1500), random.randint(600, 1500))
 
     def log(self):
         for block in self.draw_order:
