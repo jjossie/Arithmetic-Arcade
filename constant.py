@@ -19,7 +19,11 @@ NUMBER_SCALING = 1.3
 
 MAPS = [
     # "maps/joel-demo.tmx",
-    "maps/Main-Spawn.tmx"
+    "maps/Main-Spawn.tmx",
+    "maps/Castle-Area.tmx",
+    "maps/Desert-Area.tmx",
+    "maps/Grass-Area.tmx",
+    "maps/Urban-Area.tmx",
 ]
 
 PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
