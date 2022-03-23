@@ -1,6 +1,7 @@
 # Constants
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
+
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""
 MAP_SIZE = 1550
@@ -13,9 +14,10 @@ CAMERA_SPEED = 0.1
 VIEWPORT_MARGIN = 200
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.75
-TILE_SCALING = 1
-NUMBER_SCALING = 1.3
+CHARACTER_SCALING = 1
+TILE_SCALING = 2
+NUMBER_BLOCK_SCALING = TILE_SCALING / 2
+NUMBER_SCALING = NUMBER_BLOCK_SCALING * 1.3
 
 MAPS = [
     # "maps/joel-demo.tmx",
@@ -34,6 +36,7 @@ LAYER_NAME_PLAYER = "player"
 LAYER_NAME_NUMBER = "Numbers"
 LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
+LAYER_NAME_NUMBER_TARGETS = "number_targets"
 LAYER_NAME_EXIT = "exits"
 
 PLAYER_TEXTURES = []
@@ -43,7 +46,7 @@ CRATE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/"
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
 TRANSPARENT_BOX_PATH = "assets/transparent.png"
-TARGET_BOX = "assets/kenney_sokobanpack/PNG/Retina/Crates/crate_29.png"
+TARGET_BOX = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_29.png"
 TILE_SIZE = 32
 
 NUM_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Numbers/"
