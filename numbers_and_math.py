@@ -209,7 +209,6 @@ class NumberBlockGroup:
         so they appear as a single number rather than separate digits.
         """
         if self.block_template == NumberBlock:
-            print("updating textures ")
             for index, block in enumerate(self._blocks):
                 size = self.get_size()
                 if size == 1:
@@ -382,6 +381,11 @@ class VisualMathProblem:
 
         self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
 
+        self.answer_range_height = 480
+        self.answer_range_width = 1200
+        self.answer_range_offset = 120
+        self.answer_range_x_offset = 320
+
     def draw(self):
         x = self.center_x
         y = self.center_y
@@ -394,7 +398,16 @@ class VisualMathProblem:
             x += space * size + space
 
         for block in self.movable_blocks:
-            block.move_to(random.randint(100, 1500), random.randint(600, 1500))
+            block.move_to(
+                random.randint(
+                    self.center_x - self.answer_range_width // 2,
+                    self.center_x + self.answer_range_width // 2
+                ) + self.answer_range_x_offset,
+                random.randint(
+                    self.center_y,
+                    self.center_y + self.answer_range_height
+                ) + self.answer_range_offset
+            )
 
     def log(self):
         for block in self.draw_order:
