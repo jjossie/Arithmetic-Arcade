@@ -1,4 +1,5 @@
 import arcade
+from falling_tile import FallingTile
 from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
 from math import sqrt
@@ -32,7 +33,7 @@ class MyGame(arcade.Window):
         self.physics_engine = None
         self.level = 1
         # Game Logic
-        self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
+        self.map_index = 2  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
 
         self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -52,7 +53,13 @@ class MyGame(arcade.Window):
         """
 
         # Load the Tiled Map
-        layer_options = {}
+        layer_options = {
+            LAYER_NAME_FALLING_TILE: {
+                "custom_class": FallingTile,
+                "custom_class_args": {
+                }
+            }
+        }
         self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
 
         # Initialize Scene from the tilemap
@@ -63,6 +70,8 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+
+        # falling_tile = FallingTile(FALLING_TILE_PATH, TILE_SCALING)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
@@ -76,9 +85,13 @@ class MyGame(arcade.Window):
         # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
 
         # Make a test math problem
-        self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
-        self.problem.draw()
-        self.problem.log()
+        # self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
+        # self.problem.draw()
+        # self.problem.log()
+
+        for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE):
+            tile.setup(self.scene)
+
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -113,6 +126,12 @@ class MyGame(arcade.Window):
         self.player.update_player_speed()
         self.player.texture_update()
         self.player_hit_number()
+
+
+        # Call update on the fallable tiles in the scene
+        for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE).sprite_list:
+            print("falling tile being updated")
+            tile.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
