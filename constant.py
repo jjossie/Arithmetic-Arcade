@@ -18,8 +18,9 @@ TILE_SCALING = 1
 NUMBER_SCALING = 1.3
 
 MAPS = [
-    # "maps/joel-demo.tmx",
-    "maps/Main-Spawn.tmx"
+    "maps/joel-demo.tmx",
+    "maps/Main-Spawn.tmx",
+    "maps/falling-tile-demo.tmx"
 ]
 
 PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
@@ -31,6 +32,9 @@ LAYER_NAME_NUMBER = "Numbers"
 LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
 
+# Falling floor
+LAYER_NAME_FALLING_TILE = "falling_tile"
+
 PLAYER_TEXTURES = []
 IMG_PATH_EXT = ".png"
 
@@ -41,3 +45,8 @@ TRANSPARENT_BOX_PATH = "assets/transparent.png"
 TILE_SIZE = 32
 
 NUM_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Numbers/"
+
+
+# Falling tile
+FALLING_TILE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/ground_03.png"
+FALLING_TILE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/"
