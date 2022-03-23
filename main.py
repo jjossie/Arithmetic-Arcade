@@ -163,7 +163,7 @@ class MyGame(arcade.Window):
             self.view_bottom + SCREEN_HEIGHT * 0.8,
             arcade.csscolor.WHITE,
             30, )
-
+ 
     def scroll_to_player(self):
 
         # --- Manage Scrolling ---

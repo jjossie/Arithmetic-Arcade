@@ -269,17 +269,23 @@ class TargetLocation(arcade.Sprite):
         self.center_x = x
         self.center_y = y
 
+    # Check if the player got the answer right
+    def isCorrect(self):
+        if self.number_attempt.value == self.expected_value:
+            return True
+        else:
+            # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
+            return False
+
     def place_number_block(self, block: NumberBlock):
         # Try to snap in the NumberBlock
         if self.number_attempt is None:
             block.move_to(self.center_x, self.center_y)
             self.number_attempt = block
-
-            # Check if the player got the answer right
-            if self.number_attempt.value == self.expected_value:
+            
+            if self.isCorrect():
                 self.number_attempt.set_block_type(BlockType.CORRECT)
             else:
-                # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
                 self.number_attempt.set_block_type(BlockType.INCORRECT)
         else:
             pass
@@ -399,3 +405,12 @@ class VisualMathProblem:
     def log(self):
         for block in self.draw_order:
             block.log()
+
+    # Function will check if the problem has been solved and will return True/False
+    def checkIfSolved(self):
+        if TargetLocation.isCorrect():
+            print("correct")
+            return True
+        else:
+            print("incorrect")
+            return False
