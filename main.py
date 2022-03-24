@@ -1,7 +1,7 @@
 import arcade
 from numbers_and_math import VisualMathProblem, NumberBlock
 from pyglet.math import Vec2
-from math import sqrt
+
 from constant import *
 from player import Player
 
@@ -57,7 +57,7 @@ class MyGame(arcade.Window):
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        # repeat line 91 and line 88
+        #repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
@@ -69,7 +69,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
-        # self.scene.add_sprite("castle", self.castle_sprite)
+        #self.scene.add_sprite("castle", self.castle_sprite)
 
         # map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
         # my_map = arcade.tilemap.read_tmx(map_name)
@@ -77,7 +77,7 @@ class MyGame(arcade.Window):
         # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
 
         # Make a test math problem
-        self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 1, 10)
+        self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/2, 1, 10)
         self.problem.draw()
         # self.problem.log()
 
@@ -94,20 +94,23 @@ class MyGame(arcade.Window):
         if len(collisions) > 0:
             print("we hit a door")
 
+
+
     def load_new_level(self):
         """
         load_new_level() has to be called from update.
         """
 
-        #   layer_options = {}
-        #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
-        if self.level == 1:
-            self.level += 1
+     #   layer_options = {}
+      #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
+       # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
+        if self.level == 1 :
+           self.level += 1
         if self.level == 2:
-            self.level += 1
+            self.level+= 1
         if self.level == 3:
             self.level += 1
+
 
         if self.player == exit and self.level == 1:
             self.player == 2
@@ -139,12 +142,13 @@ class MyGame(arcade.Window):
         self.load_new_level
         self.player_hit_door
 
-        # self.load_new_level()
-        # check for exit collision thie is call setup for new levels
-        # if self.player_sprite.center_x >= self.end_of_map:
-        #   self.level += 1
+        #self.load_new_level()
+        #check for exit collision thie is call setup for new levels
+        #if self.player_sprite.center_x >= self.end_of_map:
+         #   self.level += 1
         # Update the player object
         self.player.update()
+        
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)

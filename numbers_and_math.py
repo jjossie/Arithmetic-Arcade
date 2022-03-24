@@ -2,6 +2,7 @@ import arcade
 import random
 import operator
 from enum import Enum
+from math import sqrt
 
 from constant import *
 
@@ -90,7 +91,22 @@ class NumberBlock(arcade.Sprite):
         auto = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
         if len(auto) != 0:  # Player dropped the block on top of a Target Location
             assert (isinstance(auto[0], TargetLocation))
-            target: TargetLocation = auto[0]
+
+            if len(auto) > 1:
+                # use the pythagorean theorem to determine which of the targetlocations is closer to this numberblock
+
+                dis_first = sqrt((self.center_x - auto[0].center_x)**2 +(self.center_y - auto[0].center_y)**2)
+                dis_second = sqrt((self.center_x - auto[1].center_x)**2 +(self.center_y - auto[1].center_y)**2)
+                if dis_first > dis_second:
+                    target: TargetLocation = auto[1]
+                elif dis_first < dis_second:
+                    target: TargetLocation = auto[0]
+            else:
+
+                target: TargetLocation = auto[0]
+
+
+
             self.target_location = target
             target.place_number_block(self)
         else:  # Player dropped the block out in the open
