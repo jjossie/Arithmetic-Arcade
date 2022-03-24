@@ -1,8 +1,6 @@
-import arcade
 import random
 import operator
 from enum import Enum
-from math import sqrt
 
 from constant import *
 
@@ -347,6 +345,10 @@ class VisualMathProblem:
     """
 
     def __init__(self, scene, center_x=0, center_y=0, min=None, max=None, operator_str=None):
+        """
+        Params:
+        :operator_str: a string with a math operator. Either "+", "-", "*", or "/".
+        """
         self.scene = scene
         self.center_x = center_x
         self.center_y = center_y

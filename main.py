@@ -1,14 +1,12 @@
-import arcade
-from numbers_and_math import VisualMathProblem, NumberBlock
-from pyglet.math import Vec2
-
 from constant import *
+from numbers_and_math import VisualMathProblem
+from pyglet.math import Vec2
 from player import Player
 
 
 class MyGame(arcade.Window):
     """
-    Main application class.
+    Main application class.~
     """
 
     def __init__(self):

@@ -1,6 +1,4 @@
-import imp
 from enum import Enum
-import arcade
 
 from constant import *
 from numbers_and_math import NumberBlock, BlockType, NumberBlockHitbox
