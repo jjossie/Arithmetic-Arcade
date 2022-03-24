@@ -1,4 +1,8 @@
 # Constants
+from math import sqrt
+
+import arcade
+
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
 
@@ -46,3 +50,22 @@ TARGET_BOX = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_29.png"
 TILE_SIZE = 32
 
 NUM_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Numbers/"
+
+
+def pick_nearest_collision(subject: arcade.Sprite, collision_list):
+    target = None
+    if len(collision_list) > 1:
+        # use the pythagorean theorem to determine which of the targetlocations is closer to this numberblock
+        dis_first = sqrt(
+            (subject.center_x - collision_list[0].center_x) ** 2 + (subject.center_y - collision_list[0].center_y) ** 2)
+        dis_second = sqrt(
+            (subject.center_x - collision_list[1].center_x) ** 2 + (subject.center_y - collision_list[1].center_y) ** 2)
+        if dis_first > dis_second:
+            target = collision_list[1]
+        elif dis_first < dis_second:
+            target = collision_list[0]
+    else:
+
+        target = collision_list[0]
+
+    return target

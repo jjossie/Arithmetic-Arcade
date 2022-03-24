@@ -88,27 +88,11 @@ class NumberBlock(arcade.Sprite):
         self.symbol_sprite.center_y = y
 
     def auto_move(self):
-        auto = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
-        if len(auto) != 0:  # Player dropped the block on top of a Target Location
-            assert (isinstance(auto[0], TargetLocation))
-
-            if len(auto) > 1:
-                # use the pythagorean theorem to determine which of the targetlocations is closer to this numberblock
-
-                dis_first = sqrt((self.center_x - auto[0].center_x)**2 +(self.center_y - auto[0].center_y)**2)
-                dis_second = sqrt((self.center_x - auto[1].center_x)**2 +(self.center_y - auto[1].center_y)**2)
-                if dis_first > dis_second:
-                    target: TargetLocation = auto[1]
-                elif dis_first < dis_second:
-                    target: TargetLocation = auto[0]
-            else:
-
-                target: TargetLocation = auto[0]
-
-
-
-            self.target_location = target
-            target.place_number_block(self)
+        collision_list = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
+        if len(collision_list) != 0:  # Player dropped the block on top of a Target Location
+            assert (isinstance(collision_list[0], TargetLocation))
+            self.target_location = pick_nearest_collision(self, collision_list)
+            self.target_location.place_number_block(self)
         else:  # Player dropped the block out in the open
             if self.target_location is not None:
                 self.target_location.clear_number_block()
@@ -310,7 +294,7 @@ class SimpleMathProblem:
     operation.
     """
 
-    def __init__(self, min_value=1, max_value=10):
+    def __init__(self, min_value=1, max_value=10, operator_str=None):
         self.operators = {
             "+": operator.add,
             "-": operator.sub,
@@ -321,7 +305,11 @@ class SimpleMathProblem:
         self.max_value = max_value
         self.lhs = random.randint(self.min_value, self.max_value)
         self.rhs = random.randint(self.min_value, self.max_value)
-        self.operator = self.get_random_operator()
+        if operator_str is None:
+            self.operator = self.get_random_operator()
+        else:
+            assert (operator_str in self.operators.keys())
+            self.operator = operator_str
         self.answer = self.get_answer()
 
     def get_random_operator(self):
@@ -332,7 +320,7 @@ class SimpleMathProblem:
         return answer
 
 
-def get_clean_problem(min=None, max=None):
+def get_clean_problem(min=None, max=None, operator_str=None):
     """
     Quick and Dirty method for getting a nice and pretty math problem; i.e., one
     where the answer comes out to an integer, not a decimal.
@@ -342,7 +330,7 @@ def get_clean_problem(min=None, max=None):
     prob = None
     valid = False
     while not valid:
-        prob = SimpleMathProblem(min, max)
+        prob = SimpleMathProblem(min, max, operator_str)
         if isinstance(prob.answer, int):
             valid = True
         elif isinstance(prob.answer, float) and prob.answer.is_integer():
@@ -358,12 +346,12 @@ class VisualMathProblem:
     the result are all represented.
     """
 
-    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None):
+    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None, operator_str=None):
         self.scene = scene
         self.center_x = center_x
         self.center_y = center_y
         self.sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
-        self.problem = get_clean_problem(min, max)
+        self.problem = get_clean_problem(min, max, operator_str)
 
         # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
