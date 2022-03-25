@@ -1,6 +1,11 @@
 # Constants
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 750
+from math import sqrt
+
+import arcade
+
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 900
+
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""
 MAP_SIZE = 1550
@@ -13,9 +18,10 @@ CAMERA_SPEED = 0.1
 VIEWPORT_MARGIN = 200
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.75
-TILE_SCALING = 1
-NUMBER_SCALING = 1.3
+CHARACTER_SCALING = 1
+TILE_SCALING = 2
+NUMBER_BLOCK_SCALING = TILE_SCALING / 2
+NUMBER_SCALING = NUMBER_BLOCK_SCALING * 1.3
 
 MAPS = [
     "maps/joel-demo.tmx",
@@ -31,6 +37,8 @@ LAYER_NAME_PLAYER = "player"
 LAYER_NAME_NUMBER = "Numbers"
 LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
+LAYER_NAME_NUMBER_TARGETS = "number_targets"
+LAYER_NAME_EXIT = "exits"
 
 # Falling tile
 LAYER_NAME_FALLING_TILE = "falling_tile"
@@ -42,11 +50,30 @@ CRATE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/"
 CRATE_BLUE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_09.png"
 CRATE_BROWN_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_07.png"
 TRANSPARENT_BOX_PATH = "assets/transparent.png"
+TARGET_BOX = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_29.png"
 TILE_SIZE = 32
 
 NUM_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Numbers/"
 
-
 # Falling tile
 FALLING_TILE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/ground_03.png"
 FALLING_TILE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/"
+
+
+def pick_nearest_collision(subject: arcade.Sprite, collision_list):
+    target = None
+    if len(collision_list) > 1:
+        # use the pythagorean theorem to determine which of the targetlocations is closer to this numberblock
+        dis_first = sqrt(
+            (subject.center_x - collision_list[0].center_x) ** 2 + (subject.center_y - collision_list[0].center_y) ** 2)
+        dis_second = sqrt(
+            (subject.center_x - collision_list[1].center_x) ** 2 + (subject.center_y - collision_list[1].center_y) ** 2)
+        if dis_first > dis_second:
+            target = collision_list[1]
+        elif dis_first < dis_second:
+            target = collision_list[0]
+    else:
+
+        target = collision_list[0]
+
+    return target

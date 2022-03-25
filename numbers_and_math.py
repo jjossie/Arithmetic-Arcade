@@ -1,10 +1,18 @@
-import arcade
 import random
 import operator
 from enum import Enum
-# from dataclasses import dataclass
 
 from constant import *
+
+
+class NumberBlockHitbox(arcade.Sprite):
+    def __init__(self, parent_block):
+        super().__init__(TRANSPARENT_BOX_PATH,
+                         scale=NUMBER_BLOCK_SCALING * 1.1,
+                         hit_box_algorithm="None",  # This is important
+                         center_x=parent_block.center_x,
+                         center_y=parent_block.center_y)
+        self.parent_block = parent_block
 
 
 class BlockGroupPosition(Enum):
@@ -39,22 +47,19 @@ class NumberBlock(arcade.Sprite):
         super().__init__()
         assert (value is not None and scene is not None)
         self.value = value
+        self.scene = scene
 
         # This determines whether it is movable, immovable, etc.
         self.block_type = BlockType.MOVABLE
         # This determines whether it is a left, right, middle, or standalone block.
         self.block_group_position: BlockGroupPosition = BlockGroupPosition.STANDALONE
         self.configure_texture()
-
-        self.texture = arcade.load_texture(CRATE_BLUE_PATH)
-        self.scale = TILE_SCALING
+        self.scale = NUMBER_BLOCK_SCALING
         self._hit_box_algorithm = "None"
+        # A reference to a TargetLocation that this block might be placed on
+        self.target_location = None
         # Auxiliary sprites. One for the hitbox, another for the number/symbol.
-        self.hit_box_sprite = arcade.Sprite(TRANSPARENT_BOX_PATH,
-                                            scale=TILE_SCALING * 1.1,
-                                            hit_box_algorithm="None",  # This is important
-                                            center_x=self.center_x,
-                                            center_y=self.center_y)
+        self.hit_box_sprite = NumberBlockHitbox(self)
         self.symbol_sprite = arcade.Sprite(self._get_symbol_path(),
                                            scale=NUMBER_SCALING,
                                            hit_box_algorithm="None")
@@ -65,23 +70,6 @@ class NumberBlock(arcade.Sprite):
         scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX).append(self.hit_box_sprite)
         # And finally, add my symbol sprite list to that top layer
         scene.get_sprite_list(LAYER_NAME_NUMBER_SYMBOLS).append(self.symbol_sprite)
-
-    def update_animation(self, delta_time: float = 1 / 60):
-        # Draw this block's numeric value on top of this sprite.
-        # arcade.draw_text(
-        #     f"{self.value}",
-        #     start_x=self.center_x,
-        #     start_y=self.center_y,
-        #     color=arcade.color.WHITE,
-        #     font_size=18 * TILE_SCALING,
-        #     width=int(self.width),
-        #     align="center",
-        #     font_name="calibri",
-        #     bold=True,
-        #     anchor_x="center",
-        #     anchor_y="center",
-        # )
-        pass
 
     def move_to(self, x, y):
         """
@@ -96,6 +84,16 @@ class NumberBlock(arcade.Sprite):
         self.hit_box_sprite.center_y = y
         self.symbol_sprite.center_x = x
         self.symbol_sprite.center_y = y
+
+    def auto_move(self):
+        collision_list = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
+        if len(collision_list) != 0:  # Player dropped the block on top of a Target Location
+            assert (isinstance(collision_list[0], TargetLocation))
+            self.target_location = pick_nearest_collision(self, collision_list)
+            self.target_location.place_number_block(self)
+        else:  # Player dropped the block out in the open
+            if self.target_location is not None:
+                self.target_location.clear_number_block()
 
     def set_block_type(self, block_type: BlockType):
         self.block_type = block_type
@@ -133,14 +131,17 @@ class NumberBlock(arcade.Sprite):
 
 class NumberBlockGroup:
     """
-    One or more (probably up to 3) NumberBlocks that represent a single value.
+    One or more (probably up to 3) Blocks that represent a single value.
+    Will be made out of NumberBlocks (which are movable) by default, but
+    can also be made as TargetLocations.
     """
 
-    def __init__(self, scene=None, x=0, y=0, blocks=None, from_number=None):
+    def __init__(self, block_template=NumberBlock, scene=None, x=0, y=0, blocks=None, from_number=None):
         assert (scene is not None)
         self.scene = scene
         self.center_x = x
         self.center_y = y
+        self.block_template = block_template
         if from_number is None:
             self._blocks = blocks
             self.value = self._compute_value()
@@ -165,13 +166,13 @@ class NumberBlockGroup:
         temp_val = self.value
 
         if isinstance(temp_val, str):
-            blocks.append(NumberBlock(self.scene, temp_val))
+            blocks.append(self.block_template(self.scene, temp_val))
         else:
             finished = False
             multiplier = 1
             while not finished:
                 single_digit = int(((temp_val % (multiplier * 10)) - (temp_val % multiplier)) / multiplier)
-                blocks.insert(0, NumberBlock(self.scene, single_digit))
+                blocks.insert(0, self.block_template(self.scene, single_digit))
                 multiplier *= 10
                 if temp_val // multiplier == 0:
                     finished = True
@@ -197,7 +198,7 @@ class NumberBlockGroup:
         next to each other properly.
         """
         for index, block in enumerate(self._blocks):
-            offset = index * TILE_SIZE * TILE_SCALING * 2
+            offset = index * TILE_SIZE * TILE_SCALING
             block.move_to(self.center_x + offset, self.center_y)
 
     def _update_textures(self):
@@ -205,21 +206,23 @@ class NumberBlockGroup:
         Updates the block_group_position property of each NumberBlock in the group
         so they appear as a single number rather than separate digits.
         """
-        for index, block in enumerate(self._blocks):
-            size = self.get_size()
-            if size == 1:
-                block.set_block_group_position(BlockGroupPosition.STANDALONE)
-            else:
-                if index == 0:
-                    block.set_block_group_position(BlockGroupPosition.LEFT)
-                elif index == size - 1:
-                    block.set_block_group_position(BlockGroupPosition.RIGHT)
+        if self.block_template == NumberBlock:
+            for index, block in enumerate(self._blocks):
+                size = self.get_size()
+                if size == 1:
+                    block.set_block_group_position(BlockGroupPosition.STANDALONE)
                 else:
-                    block.set_block_group_position(BlockGroupPosition.MIDDLE)
+                    if index == 0:
+                        block.set_block_group_position(BlockGroupPosition.LEFT)
+                    elif index == size - 1:
+                        block.set_block_group_position(BlockGroupPosition.RIGHT)
+                    else:
+                        block.set_block_group_position(BlockGroupPosition.MIDDLE)
 
     def set_block_type(self, block_type: BlockType):
-        for block in self._blocks:
-            block.set_block_type(block_type)
+        if self.block_template == NumberBlock:
+            for block in self._blocks:
+                block.set_block_type(block_type)
 
     def move_to(self, x, y):
         """
@@ -240,6 +243,48 @@ class NumberBlockGroup:
             print(str(block))
 
 
+class TargetLocation(arcade.Sprite):
+    """
+    A sprite that draws the target locations
+    """
+
+    def __init__(self, scene, expected_value):
+        super().__init__()
+
+        self.texture = arcade.load_texture(TARGET_BOX)
+        self.scale = NUMBER_BLOCK_SCALING
+        self.expected_value = expected_value
+        self.number_attempt = None
+        scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS).append(self)
+
+    def move_to(self, x, y):
+        """
+        Use this to move a TargetLocation rather than setting center_x and center_y directly.
+        This also exists for the purpose of polymorphism - to be synonymous with NumberBlockGroup,
+        which has the same function.
+        """
+        self.center_x = x
+        self.center_y = y
+
+    def place_number_block(self, block: NumberBlock):
+        # Try to snap in the NumberBlock
+        if self.number_attempt is None:
+            block.move_to(self.center_x, self.center_y)
+            self.number_attempt = block
+
+            # Check if the player got the answer right
+            if self.number_attempt.value == self.expected_value:
+                self.number_attempt.set_block_type(BlockType.CORRECT)
+            else:
+                # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
+                self.number_attempt.set_block_type(BlockType.INCORRECT)
+        else:
+            pass
+
+    def clear_number_block(self):
+        self.number_attempt = None
+
+
 class SimpleMathProblem:
     """
     Represents a math problem consisting of two operands - lhs and rhs (left-hand side
@@ -247,7 +292,7 @@ class SimpleMathProblem:
     operation.
     """
 
-    def __init__(self, min_value=1, max_value=10):
+    def __init__(self, min_value=1, max_value=10, operator_str=None):
         self.operators = {
             "+": operator.add,
             "-": operator.sub,
@@ -258,7 +303,11 @@ class SimpleMathProblem:
         self.max_value = max_value
         self.lhs = random.randint(self.min_value, self.max_value)
         self.rhs = random.randint(self.min_value, self.max_value)
-        self.operator = self.get_random_operator()
+        if operator_str is None:
+            self.operator = self.get_random_operator()
+        else:
+            assert (operator_str in self.operators.keys())
+            self.operator = operator_str
         self.answer = self.get_answer()
 
     def get_random_operator(self):
@@ -269,7 +318,7 @@ class SimpleMathProblem:
         return answer
 
 
-def get_clean_problem(min=None, max=None):
+def get_clean_problem(min=None, max=None, operator_str=None):
     """
     Quick and Dirty method for getting a nice and pretty math problem; i.e., one
     where the answer comes out to an integer, not a decimal.
@@ -279,7 +328,7 @@ def get_clean_problem(min=None, max=None):
     prob = None
     valid = False
     while not valid:
-        prob = SimpleMathProblem(min, max)
+        prob = SimpleMathProblem(min, max, operator_str)
         if isinstance(prob.answer, int):
             valid = True
         elif isinstance(prob.answer, float) and prob.answer.is_integer():
@@ -295,39 +344,76 @@ class VisualMathProblem:
     the result are all represented.
     """
 
-    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None):
+    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None, operator_str=None):
+        """
+        Params:
+        :operator_str: a string with a math operator. Either "+", "-", "*", or "/".
+        """
         self.scene = scene
         self.center_x = center_x
         self.center_y = center_y
         self.sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
-        self.problem = get_clean_problem(min, max)
+        self.problem = get_clean_problem(min, max, operator_str)
 
         # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
+        # self.lhs_target = TargetLocation(scene=self.scene, x=100)
+
         self.operator = NumberBlockGroup(scene=self.scene, from_number=str(self.problem.operator))
+        # self.operator_target = TargetLocation(scene=self.scene, x=400)
+
         self.rhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.rhs)
+        # self.rhs_target = TargetLocation(scene=self.scene, x=700)
+
         self.equals = NumberBlockGroup(scene=self.scene, from_number="=")
-        self.answer = NumberBlockGroup(scene=self.scene, from_number=self.problem.answer)
+        # self.equals_target = TargetLocation(scene=self.scene, x=1000)
+
+        self.movable_blocks = []
+        for i in range(0, 10):
+            self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
+            self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
+
+        self.answer_target = NumberBlockGroup(block_template=TargetLocation, scene=self.scene,
+                                              from_number=self.problem.answer)
 
         # Configure The Problem
         self.lhs.set_block_type(BlockType.IMMOVABLE)
         self.rhs.set_block_type(BlockType.IMMOVABLE)
         self.operator.set_block_type(BlockType.OPERATION)
         self.equals.set_block_type(BlockType.OPERATION)
-        self.answer.set_block_type(BlockType.MOVABLE)
+        for block in self.movable_blocks:
+            block.set_block_type(BlockType.MOVABLE)
+        # self.answer_target.set_block_type(BlockType.MOVABLE)
 
-        self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer]
+        self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
+
+        self.answer_range_height = 480
+        self.answer_range_width = 1200
+        self.answer_range_offset = 120
+        self.answer_range_x_offset = 320
 
     def draw(self):
         x = self.center_x
         y = self.center_y
-        space = TILE_SIZE * TILE_SCALING * 2
+        space = TILE_SIZE * TILE_SCALING
         for chunk in self.draw_order:
             size = chunk.get_size()
             chunk.move_to(x, y)
 
             # Move over to the next space
             x += space * size + space
+
+        for block in self.movable_blocks:
+            block.move_to(
+                random.randint(
+                    self.center_x - self.answer_range_width // 2,
+                    self.center_x + self.answer_range_width // 2
+                ) + self.answer_range_x_offset,
+                random.randint(
+                    self.center_y,
+                    self.center_y + self.answer_range_height
+                ) + self.answer_range_offset
+            )
 
     def log(self):
         for block in self.draw_order:

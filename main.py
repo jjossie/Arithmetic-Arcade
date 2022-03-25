@@ -1,15 +1,14 @@
 import arcade
 from falling_tile import FallingTile
+from constant import *
 from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
-from math import sqrt
-from constant import *
 from player import Player
 
 
 class MyGame(arcade.Window):
     """
-    Main application class.
+    Main application class.~
     """
 
     def __init__(self):
@@ -51,7 +50,7 @@ class MyGame(arcade.Window):
         Then the player sprite can be loaded and added to the scene afterward so that they draw
         in the proper order.
         """
-
+        map_name = "maps/Main-Spawn.tmx"
         # Load the Tiled Map
         layer_options = {
             LAYER_NAME_FALLING_TILE: {
@@ -66,6 +65,7 @@ class MyGame(arcade.Window):
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
         # repeat line 91 and line 88
         # Create the Sprite lists
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
@@ -92,6 +92,17 @@ class MyGame(arcade.Window):
         for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE):
             tile.setup(self.scene)
 
+        # self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 1, 10)
+        problems = [
+            VisualMathProblem(self.scene, 200, 200, 1, 10, operator_str="+"),
+            VisualMathProblem(self.scene, 200, 800, 1, 10, operator_str="-"),
+            VisualMathProblem(self.scene, 200, 1600, 1, 10, operator_str="*"),
+            # VisualMathProblem(self.scene, 200, 1100, 1, 10, operator_str="/")
+        ]
+        for problem in problems:
+            problem.draw()
+        # self.problem.draw()
+        # self.problem.log()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -100,6 +111,30 @@ class MyGame(arcade.Window):
                 self.scene.get_sprite_list(LAYER_NAME_NUMBER)
             ]
         )
+
+    def player_hit_door(self):
+        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
+        if len(collisions) > 0:
+            print("we hit a door")
+
+    def load_new_level(self):
+        """
+        load_new_level() has to be called from update.
+        """
+
+        #   layer_options = {}
+        #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
+        # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
+        if self.level == 1:
+            self.level += 1
+        if self.level == 2:
+            self.level += 1
+        if self.level == 3:
+            self.level += 1
+
+        if self.player == exit and self.level == 1:
+            self.player == 2
+            self.player += 1
 
     def on_draw(self):
         """Render the screen."""
@@ -123,9 +158,16 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
-        self.player.update_player_speed()
-        self.player.texture_update()
-        self.player_hit_number()
+        # self.texture_update()
+        self.load_new_level
+        self.player_hit_door
+
+        # self.load_new_level()
+        # check for exit collision thie is call setup for new levels
+        # if self.player_sprite.center_x >= self.end_of_map:
+        #   self.level += 1
+        # Update the player object
+        self.player.update()
 
 
         # Call update on the fallable tiles in the scene
@@ -139,44 +181,17 @@ class MyGame(arcade.Window):
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
 
-    def player_hit_number(self):
-        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
-        if len(collisions) != 0:
-            return True
-        return False
-
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
-        show_caption = False
         cap = "Press Space to lift it up"
 
-        # left_distance = sqrt((self.problem.lhs.center_x - self.player.center_x) ** 2 + (
-        #         self.problem.lhs.center_y - self.player.center_y) ** 2)
-        # right_distance = sqrt((self.problem.rhs.center_x - self.player.center_x) ** 2 + (
-        #         self.problem.rhs.center_y - self.player.center_y) ** 2)
-        #
-        # if left_distance < 55:
-        #     show_caption = True
-        # elif right_distance < 55:
-        #     show_caption = True
-        # else:
-        #     show_caption = False
-
-        if self.player_hit_number():
-            arcade.draw_text(
-                cap,
-                self.view_left + SCREEN_WIDTH * 0.3,
-                self.view_bottom + SCREEN_HEIGHT * 0.8,
-                arcade.csscolor.WHITE,
-                30, )
-        else:
-            arcade.draw_text(
-                " ",
-                0,
-                0,
-                arcade.csscolor.WHITE,
-                18, )
+        arcade.draw_text(
+            cap,
+            self.view_left + SCREEN_WIDTH * 0.3,
+            self.view_bottom + SCREEN_HEIGHT * 0.8,
+            arcade.csscolor.WHITE,
+            30, )
 
     def scroll_to_player(self):
 
