@@ -24,8 +24,8 @@ NUMBER_BLOCK_SCALING = TILE_SCALING / 2
 NUMBER_SCALING = NUMBER_BLOCK_SCALING * 1.3
 
 MAPS = [
-    "maps/joel-demo.tmx",
-    "maps/Main-Spawn.tmx",
+    # "maps/joel-demo.tmx",
+    # "maps/Main-Spawn.tmx",
     "maps/falling-tile-demo.tmx"
 ]
 
