@@ -32,7 +32,7 @@ class MyGame(arcade.Window):
         self.physics_engine = None
         self.level = 1
         # Game Logic
-        self.map_index = 2  # Index representing which map within global MAPS we're loading for this level.
+        self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
 
         self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -50,7 +50,6 @@ class MyGame(arcade.Window):
         Then the player sprite can be loaded and added to the scene afterward so that they draw
         in the proper order.
         """
-        map_name = "maps/Main-Spawn.tmx"
         # Load the Tiled Map
         layer_options = {
             LAYER_NAME_FALLING_TILE: {
@@ -103,6 +102,57 @@ class MyGame(arcade.Window):
             problem.draw()
         # self.problem.draw()
         # self.problem.log()
+
+        # Create the 'physics engine'
+        self.physics_engine = arcade.PhysicsEngineSimple(
+            self.player, [
+                self.scene.get_sprite_list(LAYER_NAME_WALLS),
+                self.scene.get_sprite_list(LAYER_NAME_NUMBER)
+            ]
+        )
+
+    def setupFallingTileRoom(self):
+        """
+            Set up the FallingTileRoom map/scene/stage/level here.
+        """
+        map_name = "maps/falling-tile-demo.tmx"
+        
+        # Custom map options
+        layer_options = {
+            LAYER_NAME_FALLING_TILE: {
+                "custom_class": FallingTile,
+                "custom_class_args": {
+                }
+            }
+        }
+
+        # Load tile_map
+        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
+
+        # Initialize Scene from the tilemap
+        self.scene = arcade.Scene.from_tilemap(self.tile_map)
+        # repeat line 91 and line 88
+        # Create the Sprite lists
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
+        self.scene.add_sprite_list(LAYER_NAME_PLAYER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
+        self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+
+
+        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        
+        self.exit_list = arcade.SpriteList()
+
+        for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE):
+            tile.setup(self.scene)
+
+        problems = [
+            VisualMathProblem(self.scene, 200, 800, 1, 10, operator_str="-"),
+            
+        ]
+        for problem in problems:
+            problem.draw()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -225,7 +275,7 @@ class MyGame(arcade.Window):
 def main():
     """Main function"""
     window = MyGame()
-    window.setup()
+    window.setupFallingTileRoom()
     arcade.run()
 
 
