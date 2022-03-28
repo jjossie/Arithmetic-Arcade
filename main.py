@@ -86,8 +86,9 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
-        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        
         self.exit_list = arcade.SpriteList()
+        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(

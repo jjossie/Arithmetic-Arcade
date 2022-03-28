@@ -22,6 +22,7 @@ class Page(arcade.Sprite):
             arcade.load_texture("assets/transparent.png")
         )
         self.texture = PAGE_TEXTURE[0]
+        print("NOOOOOOOOOOOOOOOOOOOOOO")
 
     def update(self):
         #self.texture_update()
