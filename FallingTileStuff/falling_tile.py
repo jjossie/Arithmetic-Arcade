@@ -28,7 +28,6 @@ class FallingTile(arcade.Sprite):
         angle: float = 0,
         # scene = None,
     ):
-
         super().__init__(scale=scale / 2)
 
         self.isFalling = False
@@ -36,6 +35,7 @@ class FallingTile(arcade.Sprite):
         self.texture = arcade.load_texture(FALLING_TILE_PATH)
         self.player_sprite_list = None
     
+
     def setup(self, scene):
 
         print(f"FallingTile Scene: {scene}")
