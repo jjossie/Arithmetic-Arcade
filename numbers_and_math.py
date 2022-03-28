@@ -241,6 +241,14 @@ class NumberBlockGroup:
     def get_size(self):
         return len(self._blocks)
 
+    def is_correct(self):
+        assert(self.block_template == TargetLocation)
+        for target in self._blocks:
+            assert(isinstance(target, TargetLocation))
+            if not target.is_correct():
+                return False
+        return True
+
     def log(self):
         for block in self._blocks:
             print(str(block))
@@ -270,7 +278,7 @@ class TargetLocation(arcade.Sprite):
         self.center_y = y
 
     # Check if the player got the answer right
-    def isCorrect(self):
+    def is_correct(self):
         if self.number_attempt.value == self.expected_value:
             return True
         else:
@@ -283,7 +291,7 @@ class TargetLocation(arcade.Sprite):
             block.move_to(self.center_x, self.center_y)
             self.number_attempt = block
             
-            if self.isCorrect():
+            if self.is_correct():
                 self.number_attempt.set_block_type(BlockType.CORRECT)
             else:
                 self.number_attempt.set_block_type(BlockType.INCORRECT)
@@ -406,9 +414,13 @@ class VisualMathProblem:
         for block in self.draw_order:
             block.log()
 
-    # Function will check if the problem has been solved and will return True/False
-    def checkIfSolved(self):
-        if TargetLocation.isCorrect():
+
+    def is_solved(self) -> bool:
+        """
+        Function will check if the problem has been solved and will return True/False.
+        Basically an alias for self.answer_target.is_correct().
+        """
+        if self.answer_target.is_correct():
             print("correct")
             return True
         else:
