@@ -174,15 +174,17 @@ class MyGame(arcade.Window):
         # Clear the screen to the background color
         arcade.start_render()
 
+        # Use the main camera for the scene
+        self.camera.use()
+
         # Draw our Scene
         self.scene.draw()
-
-        self.camera.use()
 
         # Draw Math Layer
         self.scene.get_sprite_list(LAYER_NAME_NUMBER).update_animation()
 
-        # self.gui_camera.use()
+        # Use the GUI Camera for the score and stuff
+        self.gui_camera.use()
         self.draw_score()
         self.caption()
 
@@ -221,8 +223,9 @@ class MyGame(arcade.Window):
             percentage = int(self.score / self.max_score * 100)
             arcade.draw_text(
                 text=f"Problems Completed: {self.score}/{self.max_score} ({percentage}%)",
-                start_x = 50,
-                start_y = 50,
+                start_x = 100,
+                start_y = 100,
+                font_size=25,
                 bold=True
             )
 
@@ -239,10 +242,13 @@ class MyGame(arcade.Window):
 
         arcade.draw_text(
             cap,
-            self.view_left + SCREEN_WIDTH * 0.3,
-            self.view_bottom + SCREEN_HEIGHT * 0.8,
-            arcade.csscolor.WHITE,
-            30, )
+            # self.view_left + SCREEN_WIDTH * 0.3,
+            # self.view_bottom + SCREEN_HEIGHT * 0.8,
+            start_x=SCREEN_HEIGHT / 2,
+            start_y=SCREEN_HEIGHT / 2,
+            color=arcade.csscolor.WHITE,
+            font_size=30
+        )
  
     def scroll_to_player(self):
 
