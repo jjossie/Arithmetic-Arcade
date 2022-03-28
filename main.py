@@ -1,5 +1,5 @@
 import arcade
-from falling_tile import FallingTile
+from FallingTileStuff.falling_tile import FallingTile
 from numbers_and_math import VisualMathProblem, NumberBlock, VisualMathProblemLocation
 from pyglet.math import Vec2
 from math import sqrt
@@ -147,7 +147,7 @@ class MyGame(arcade.Window):
             tile.setup(self.scene)
 
         problems = [
-            VisualMathProblem(self.scene, 200, 800, 1, 10, operator_str="-"),
+            VisualMathProblem(self.scene, 235, 1055, 1, 10, operator_str="-"),
 
         ]
         for problem in problems:
