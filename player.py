@@ -168,6 +168,7 @@ class Player(arcade.Sprite):
         # Reduces the amount of collision checking that has to happen which should improve performance.
         self.block.auto_move()
         self.block = None
+        self.window.update_score()
 
     def check_for_block_collisions(self):
         """

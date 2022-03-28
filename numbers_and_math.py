@@ -277,6 +277,8 @@ class TargetLocation(arcade.Sprite):
 
     # Check if the player got the answer right
     def is_correct(self):
+        if self.number_attempt is None:
+            return False
         if self.number_attempt.value == self.expected_value:
             return True
         else:
