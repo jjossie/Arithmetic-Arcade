@@ -28,6 +28,9 @@ class MyGame(arcade.Window):
 
         # Some game status/logic
         self.is_falling_tile_map = False
+        self.score = None
+        self.max_score = None
+        self.problem_list = []
 
         # Load Textures
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
@@ -42,11 +45,9 @@ class MyGame(arcade.Window):
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
 
         self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.gui_camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.view_bottom = 0
         self.view_left = 0
-
-        # A Camera that can be used to draw GUI elements
-        self.gui_camera = None
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
@@ -99,6 +100,15 @@ class MyGame(arcade.Window):
         for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
             assert (isinstance(prob, VisualMathProblemLocation))
             prob.setup(self.scene)
+            self.problem_list.append(prob.vmp)
+
+        # Game Logic
+        self.score = 0
+        if self.problem_list is not None:
+            self.max_score = len(self.problem_list)
+        else:
+            self.max_score = 0
+
 
     def setupFallingTileRoom(self):
         """
@@ -164,14 +174,18 @@ class MyGame(arcade.Window):
         # Clear the screen to the background color
         arcade.start_render()
 
+        # Use the main camera for the scene
+        self.camera.use()
+
         # Draw our Scene
         self.scene.draw()
-
-        self.camera.use()
 
         # Draw Math Layer
         self.scene.get_sprite_list(LAYER_NAME_NUMBER).update_animation()
 
+        # Use the GUI Camera for the score and stuff
+        self.gui_camera.use()
+        self.draw_score()
         self.caption()
 
     def on_update(self, delta_time):
@@ -192,6 +206,29 @@ class MyGame(arcade.Window):
                 print("falling tile being updated")
                 tile.update()
 
+
+    def update_score(self):
+        temp_score = 0
+        for problem in self.problem_list:
+            assert(isinstance(problem, VisualMathProblem))
+            if problem.is_solved():
+                temp_score += 1
+        self.score = temp_score
+        
+    def is_level_complete(self) -> bool:
+        return self.score >= self.max_score
+
+    def draw_score(self):
+        if self.max_score > 0: # Make sure we don't display score on a level without one (the main area)
+            percentage = int(self.score / self.max_score * 100)
+            arcade.draw_text(
+                text=f"Problems Completed: {self.score}/{self.max_score} ({percentage}%)",
+                start_x = 100,
+                start_y = 100,
+                font_size=25,
+                bold=True
+            )
+
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
 
@@ -205,11 +242,14 @@ class MyGame(arcade.Window):
 
         arcade.draw_text(
             cap,
-            self.view_left + SCREEN_WIDTH * 0.3,
-            self.view_bottom + SCREEN_HEIGHT * 0.8,
-            arcade.csscolor.WHITE,
-            30, )
-
+            # self.view_left + SCREEN_WIDTH * 0.3,
+            # self.view_bottom + SCREEN_HEIGHT * 0.8,
+            start_x=SCREEN_HEIGHT / 2,
+            start_y=SCREEN_HEIGHT / 2,
+            color=arcade.csscolor.WHITE,
+            font_size=30
+        )
+ 
     def scroll_to_player(self):
 
         # --- Manage Scrolling ---
