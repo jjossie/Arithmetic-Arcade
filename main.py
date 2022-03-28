@@ -86,9 +86,11 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+        self.scene.add_sprite_list(LAYER_NAME_PAGE)
         
         self.exit_list = arcade.SpriteList()
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -142,9 +144,12 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
+        
+
 
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
+       
         # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
         # self.scene.add_sprite("castle", self.castle_sprite)
@@ -208,6 +213,7 @@ class MyGame(arcade.Window):
         # Update the player object
         self.player.update()
         self.page.update()
+        
 
         # Call update on the fallable tiles in the scene if necessary
         if self.is_falling_tile_map:
@@ -241,6 +247,7 @@ class MyGame(arcade.Window):
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
         self.page.on_key_press(symbol, modifiers)
+        
         
 
     def on_key_release(self, symbol: int, modifiers: int):
