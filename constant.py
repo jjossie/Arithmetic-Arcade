@@ -38,8 +38,10 @@ LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
 LAYER_NAME_NUMBER_TARGETS = "number_targets"
 LAYER_NAME_EXIT = "exits"
+LAYER_NAME_PAGE = "page"
 
 PLAYER_TEXTURES = []
+PAGE_TEXTURE = []
 IMG_PATH_EXT = ".png"
 
 CRATE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/"

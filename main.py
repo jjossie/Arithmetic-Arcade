@@ -2,6 +2,7 @@ from constant import *
 from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
 from player import Player
+from page import Page
 
 
 class MyGame(arcade.Window):
@@ -19,6 +20,7 @@ class MyGame(arcade.Window):
         self.problem = None
         self.scene = None
         self.player = Player(self)
+        self.page = Page(self)
 
         # Load Textures
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
@@ -62,9 +64,11 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+        self.scene.add_sprite_list(LAYER_NAME_PAGE)
 
         # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
         # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
         # self.scene.add_sprite("castle", self.castle_sprite)
@@ -151,9 +155,12 @@ class MyGame(arcade.Window):
         #   self.level += 1
         # Update the player object
         self.player.update()
+        self.page.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
+        self.page.on_key_press(symbol, modifiers)
+        
 
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
