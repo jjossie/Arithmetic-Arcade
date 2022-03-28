@@ -168,6 +168,7 @@ class NumberBlockGroup:
         if isinstance(temp_val, str):
             blocks.append(self.block_template(self.scene, temp_val))
         else:
+            assert(temp_val >= 0)
             finished = False
             multiplier = 1
             while not finished:
@@ -238,6 +239,14 @@ class NumberBlockGroup:
     def get_size(self):
         return len(self._blocks)
 
+    def is_correct(self):
+        assert(self.block_template == TargetLocation)
+        for target in self._blocks:
+            assert(isinstance(target, TargetLocation))
+            if not target.is_correct():
+                return False
+        return True
+
     def log(self):
         for block in self._blocks:
             print(str(block))
@@ -266,14 +275,23 @@ class TargetLocation(arcade.Sprite):
         self.center_x = x
         self.center_y = y
 
+    # Check if the player got the answer right
+    def is_correct(self):
+        if self.number_attempt is None:
+            return False
+        if self.number_attempt.value == self.expected_value:
+            return True
+        else:
+            # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
+            return False
+
     def place_number_block(self, block: NumberBlock):
         # Try to snap in the NumberBlock
         if self.number_attempt is None:
             block.move_to(self.center_x, self.center_y)
             self.number_attempt = block
 
-            # Check if the player got the answer right
-            if self.number_attempt.value == self.expected_value:
+            if self.is_correct():
                 self.number_attempt.set_block_type(BlockType.CORRECT)
             else:
                 # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
@@ -299,8 +317,17 @@ class SimpleMathProblem:
             "*": operator.mul,
             "/": operator.truediv,
         }
-        self.min_value = min_value
-        self.max_value = max_value
+        finished = False
+        while not finished:
+            self.setup(operator_str)
+            if self.answer >= 0:
+                # Could be a decimal, but get_clean_problem() should take care of that
+                finished = True
+
+
+    def setup(self, operator_str):
+        self.min_value = 1
+        self.max_value = 10
         self.lhs = random.randint(self.min_value, self.max_value)
         self.rhs = random.randint(self.min_value, self.max_value)
         if operator_str is None:
@@ -418,3 +445,40 @@ class VisualMathProblem:
     def log(self):
         for block in self.draw_order:
             block.log()
+
+
+    def is_solved(self) -> bool:
+        """
+        Function will check if the problem has been solved and will return True/False.
+        Basically an alias for self.answer_target.is_correct().
+        """
+        if self.answer_target.is_correct():
+            print("correct")
+            return True
+        else:
+            print("incorrect")
+            return False
+
+class VisualMathProblemLocation(arcade.Sprite):
+    def __init__(self,
+                 filename=None,
+                 scale=None,
+                 image_x=None,
+                 image_y=None,
+                 image_width=None,
+                 image_height=None,
+                 center_x=None,
+                 center_y=None,
+                 flipped_horizontally=None,
+                 flipped_vertically=None,
+                 flipped_diagonally=None,
+                 hit_box_algorithm=None,
+                 hit_box_detail=None,
+                 texture=None,
+                 angle=None):
+        super().__init__()
+        self.vmp = None
+
+    def setup(self, scene):
+        self.vmp = VisualMathProblem(scene, self.center_x, self.center_y)
+        self.vmp.draw()
