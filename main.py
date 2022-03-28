@@ -1,14 +1,18 @@
 import arcade
 from falling_tile import FallingTile
+from numbers_and_math import VisualMathProblem, NumberBlock, VisualMathProblemLocation
+from pyglet.math import Vec2
+from math import sqrt
 from constant import *
 from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
+import constant
 from player import Player
 
 
 class MyGame(arcade.Window):
     """
-    Main application class.~
+    Main application class.
     """
 
     def __init__(self):
@@ -22,6 +26,9 @@ class MyGame(arcade.Window):
         self.scene = None
         self.player = Player(self)
 
+        # Some game status/logic
+        self.is_falling_tile_map = False
+
         # Load Textures
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_05.png"))
@@ -30,7 +37,6 @@ class MyGame(arcade.Window):
 
         # Our physics engine
         self.physics_engine = None
-        self.level = 1
         # Game Logic
         self.map_index = 0  # Index representing which map within global MAPS we're loading for this level.
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
@@ -50,58 +56,35 @@ class MyGame(arcade.Window):
         Then the player sprite can be loaded and added to the scene afterward so that they draw
         in the proper order.
         """
+        self.is_falling_tile_map = False
         # Load the Tiled Map
         layer_options = {
-            LAYER_NAME_FALLING_TILE: {
-                "custom_class": FallingTile,
-                "custom_class_args": {
-                }
-            }
+            LAYER_NAME_MATH_PROBLEM_ORIGIN: {
+                "custom_class": VisualMathProblemLocation
+            },
+            LAYER_NAME_WALLS: {
+                "hit_box_algorithm": "None",
+                "use_spatial_hash": True
+            },
+            # This will only be needed when we're doing a falling tile room.
+            # LAYER_NAME_FALLING_TILE: {
+            #     "custom_class": FallingTile,
+            #     "custom_class_args": {
+            #     }
+            # }
         }
         self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
 
         # Initialize Scene from the tilemap
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        # repeat line 91 and line 88
         # Create the Sprite lists
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
         self.scene.add_sprite_list(LAYER_NAME_PLAYER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
-
-        # falling_tile = FallingTile(FALLING_TILE_PATH, TILE_SCALING)
-
-        # self.player_list.append(self.player_sprite)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
-        # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
-        # self.scene.add_sprite("castle", self.castle_sprite)
-
-        # map_name = f":resources:tmx_maps/map2_level_{level}.tmx"
-        # my_map = arcade.tilemap.read_tmx(map_name)
-
-        # self.wall_list = arcade.tilemap.process_layer(map_object=my_map, layer_name=walls, scaling=TILE_SCALING, use_spatial_hash=True)
-
-        # Make a test math problem
-        # self.problem = VisualMathProblem(self.scene, 400, 300, 1, 10)
-        # self.problem.draw()
-        # self.problem.log()
-
-        for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE):
-            tile.setup(self.scene)
-
-        # self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 1, 10)
-        problems = [
-            VisualMathProblem(self.scene, 200, 200, 1, 10, operator_str="+"),
-            VisualMathProblem(self.scene, 200, 800, 1, 10, operator_str="-"),
-            VisualMathProblem(self.scene, 200, 1600, 1, 10, operator_str="*"),
-            # VisualMathProblem(self.scene, 200, 1100, 1, 10, operator_str="/")
-        ]
-        for problem in problems:
-            problem.draw()
-        # self.problem.draw()
-        # self.problem.log()
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -111,12 +94,19 @@ class MyGame(arcade.Window):
             ]
         )
 
+        # Set up the math problems
+
+        for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
+            assert (isinstance(prob, VisualMathProblemLocation))
+            prob.setup(self.scene)
+
     def setupFallingTileRoom(self):
         """
             Set up the FallingTileRoom map/scene/stage/level here.
         """
         map_name = "maps/falling-tile-demo.tmx"
-        
+        self.is_falling_tile_map = True
+
         # Custom map options
         layer_options = {
             LAYER_NAME_FALLING_TILE: {
@@ -139,9 +129,8 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
 
-
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
-        
+
         self.exit_list = arcade.SpriteList()
 
         for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE):
@@ -149,7 +138,7 @@ class MyGame(arcade.Window):
 
         problems = [
             VisualMathProblem(self.scene, 200, 800, 1, 10, operator_str="-"),
-            
+
         ]
         for problem in problems:
             problem.draw()
@@ -165,26 +154,9 @@ class MyGame(arcade.Window):
     def player_hit_door(self):
         collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
         if len(collisions) > 0:
-            print("we hit a door")
-
-    def load_new_level(self):
-        """
-        load_new_level() has to be called from update.
-        """
-
-        #   layer_options = {}
-        #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
-        if self.level == 1:
-            self.level += 1
-        if self.level == 2:
-            self.level += 1
-        if self.level == 3:
-            self.level += 1
-
-        if self.player == exit and self.level == 1:
-            self.player == 2
-            self.player += 1
+            self.map_index += 1
+            self.setup()
+            print("We hit a door to advance to next level")
 
     def on_draw(self):
         """Render the screen."""
@@ -208,22 +180,17 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
-        # self.texture_update()
-        self.load_new_level
-        self.player_hit_door
 
-        # self.load_new_level()
-        # check for exit collision thie is call setup for new levels
-        # if self.player_sprite.center_x >= self.end_of_map:
-        #   self.level += 1
+        self.player_hit_door()
+
         # Update the player object
         self.player.update()
 
-
-        # Call update on the fallable tiles in the scene
-        for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE).sprite_list:
-            print("falling tile being updated")
-            tile.update()
+        # Call update on the fallable tiles in the scene if necessary
+        if self.is_falling_tile_map:
+            for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE).sprite_list:
+                print("falling tile being updated")
+                tile.update()
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
@@ -275,7 +242,9 @@ class MyGame(arcade.Window):
 def main():
     """Main function"""
     window = MyGame()
-    window.setupFallingTileRoom()
+    window.setup()
+    # Christian's version
+    # window.setupFallingTileRoom()
     arcade.run()
 
 

@@ -168,6 +168,7 @@ class NumberBlockGroup:
         if isinstance(temp_val, str):
             blocks.append(self.block_template(self.scene, temp_val))
         else:
+            assert(temp_val >= 0)
             finished = False
             multiplier = 1
             while not finished:
@@ -299,8 +300,17 @@ class SimpleMathProblem:
             "*": operator.mul,
             "/": operator.truediv,
         }
-        self.min_value = min_value
-        self.max_value = max_value
+        finished = False
+        while not finished:
+            self.setup(operator_str)
+            if self.answer >= 0:
+                # Could be a decimal, but get_clean_problem() should take care of that
+                finished = True
+
+
+    def setup(self, operator_str):
+        self.min_value = 1
+        self.max_value = 10
         self.lhs = random.randint(self.min_value, self.max_value)
         self.rhs = random.randint(self.min_value, self.max_value)
         if operator_str is None:
@@ -418,3 +428,28 @@ class VisualMathProblem:
     def log(self):
         for block in self.draw_order:
             block.log()
+
+
+class VisualMathProblemLocation(arcade.Sprite):
+    def __init__(self,
+                 filename=None,
+                 scale=None,
+                 image_x=None,
+                 image_y=None,
+                 image_width=None,
+                 image_height=None,
+                 center_x=None,
+                 center_y=None,
+                 flipped_horizontally=None,
+                 flipped_vertically=None,
+                 flipped_diagonally=None,
+                 hit_box_algorithm=None,
+                 hit_box_detail=None,
+                 texture=None,
+                 angle=None):
+        super().__init__()
+        self.vmp = None
+
+    def setup(self, scene):
+        self.vmp = VisualMathProblem(scene, self.center_x, self.center_y)
+        self.vmp.draw()
