@@ -1,6 +1,4 @@
-import imp
 from enum import Enum
-import arcade
 
 from constant import *
 from numbers_and_math import NumberBlock, BlockType, NumberBlockHitbox
@@ -181,7 +179,8 @@ class Player(arcade.Sprite):
                                                           self.window.scene.get_sprite_list(LAYER_NAME_NUMBER_HITBOX))
             if len(blocks) != 0:
                 assert (isinstance(blocks[0], NumberBlockHitbox))
-                block = blocks[0].parent_block
+                hitbox: NumberBlockHitbox = pick_nearest_collision(self, blocks)
+                block: NumberBlock = hitbox.parent_block
                 # Make sure this block is actually a NumberBlock
                 assert (isinstance(block, NumberBlock))
                 if self.space_pressed:

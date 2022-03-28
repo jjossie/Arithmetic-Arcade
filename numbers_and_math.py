@@ -1,4 +1,3 @@
-import arcade
 import random
 import operator
 from enum import Enum
@@ -87,12 +86,11 @@ class NumberBlock(arcade.Sprite):
         self.symbol_sprite.center_y = y
 
     def auto_move(self):
-        auto = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
-        if len(auto) != 0:  # Player dropped the block on top of a Target Location
-            assert (isinstance(auto[0], TargetLocation))
-            target: TargetLocation = auto[0]
-            self.target_location = target
-            target.place_number_block(self)
+        collision_list = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
+        if len(collision_list) != 0:  # Player dropped the block on top of a Target Location
+            assert (isinstance(collision_list[0], TargetLocation))
+            self.target_location = pick_nearest_collision(self, collision_list)
+            self.target_location.place_number_block(self)
         else:  # Player dropped the block out in the open
             if self.target_location is not None:
                 self.target_location.clear_number_block()
@@ -170,6 +168,7 @@ class NumberBlockGroup:
         if isinstance(temp_val, str):
             blocks.append(self.block_template(self.scene, temp_val))
         else:
+            assert(temp_val >= 0)
             finished = False
             multiplier = 1
             while not finished:
@@ -209,7 +208,6 @@ class NumberBlockGroup:
         so they appear as a single number rather than separate digits.
         """
         if self.block_template == NumberBlock:
-            print("updating textures ")
             for index, block in enumerate(self._blocks):
                 size = self.get_size()
                 if size == 1:
@@ -290,10 +288,11 @@ class TargetLocation(arcade.Sprite):
         if self.number_attempt is None:
             block.move_to(self.center_x, self.center_y)
             self.number_attempt = block
-            
+
             if self.is_correct():
                 self.number_attempt.set_block_type(BlockType.CORRECT)
             else:
+                # If we wanted to keep track of failed attempts for a score, this would be where we'd do it
                 self.number_attempt.set_block_type(BlockType.INCORRECT)
         else:
             pass
@@ -309,18 +308,31 @@ class SimpleMathProblem:
     operation.
     """
 
-    def __init__(self, min_value=1, max_value=10):
+    def __init__(self, min_value=1, max_value=10, operator_str=None):
         self.operators = {
             "+": operator.add,
             "-": operator.sub,
             "*": operator.mul,
             "/": operator.truediv,
         }
-        self.min_value = min_value
-        self.max_value = max_value
+        finished = False
+        while not finished:
+            self.setup(operator_str)
+            if self.answer >= 0:
+                # Could be a decimal, but get_clean_problem() should take care of that
+                finished = True
+
+
+    def setup(self, operator_str):
+        self.min_value = 1
+        self.max_value = 10
         self.lhs = random.randint(self.min_value, self.max_value)
         self.rhs = random.randint(self.min_value, self.max_value)
-        self.operator = self.get_random_operator()
+        if operator_str is None:
+            self.operator = self.get_random_operator()
+        else:
+            assert (operator_str in self.operators.keys())
+            self.operator = operator_str
         self.answer = self.get_answer()
 
     def get_random_operator(self):
@@ -331,7 +343,7 @@ class SimpleMathProblem:
         return answer
 
 
-def get_clean_problem(min=None, max=None):
+def get_clean_problem(min=None, max=None, operator_str=None):
     """
     Quick and Dirty method for getting a nice and pretty math problem; i.e., one
     where the answer comes out to an integer, not a decimal.
@@ -341,7 +353,7 @@ def get_clean_problem(min=None, max=None):
     prob = None
     valid = False
     while not valid:
-        prob = SimpleMathProblem(min, max)
+        prob = SimpleMathProblem(min, max, operator_str)
         if isinstance(prob.answer, int):
             valid = True
         elif isinstance(prob.answer, float) and prob.answer.is_integer():
@@ -357,12 +369,16 @@ class VisualMathProblem:
     the result are all represented.
     """
 
-    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None):
+    def __init__(self, scene, center_x=0, center_y=0, min=None, max=None, operator_str=None):
+        """
+        Params:
+        :operator_str: a string with a math operator. Either "+", "-", "*", or "/".
+        """
         self.scene = scene
         self.center_x = center_x
         self.center_y = center_y
         self.sprite_list = self.scene.get_sprite_list(LAYER_NAME_NUMBER)
-        self.problem = get_clean_problem(min, max)
+        self.problem = get_clean_problem(min, max, operator_str)
 
         # Number Block Groups
         self.lhs = NumberBlockGroup(scene=self.scene, from_number=self.problem.lhs)
@@ -396,6 +412,11 @@ class VisualMathProblem:
 
         self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
 
+        self.answer_range_height = 480
+        self.answer_range_width = 1200
+        self.answer_range_offset = 120
+        self.answer_range_x_offset = 320
+
     def draw(self):
         x = self.center_x
         y = self.center_y
@@ -408,7 +429,16 @@ class VisualMathProblem:
             x += space * size + space
 
         for block in self.movable_blocks:
-            block.move_to(random.randint(100, 1500), random.randint(600, 1500))
+            block.move_to(
+                random.randint(
+                    self.center_x - self.answer_range_width // 2,
+                    self.center_x + self.answer_range_width // 2
+                ) + self.answer_range_x_offset,
+                random.randint(
+                    self.center_y,
+                    self.center_y + self.answer_range_height
+                ) + self.answer_range_offset
+            )
 
     def log(self):
         for block in self.draw_order:
@@ -426,3 +456,27 @@ class VisualMathProblem:
         else:
             print("incorrect")
             return False
+
+class VisualMathProblemLocation(arcade.Sprite):
+    def __init__(self,
+                 filename=None,
+                 scale=None,
+                 image_x=None,
+                 image_y=None,
+                 image_width=None,
+                 image_height=None,
+                 center_x=None,
+                 center_y=None,
+                 flipped_horizontally=None,
+                 flipped_vertically=None,
+                 flipped_diagonally=None,
+                 hit_box_algorithm=None,
+                 hit_box_detail=None,
+                 texture=None,
+                 angle=None):
+        super().__init__()
+        self.vmp = None
+
+    def setup(self, scene):
+        self.vmp = VisualMathProblem(scene, self.center_x, self.center_y)
+        self.vmp.draw()
