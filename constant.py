@@ -25,7 +25,13 @@ NUMBER_SCALING = NUMBER_BLOCK_SCALING * 1.3
 
 MAPS = [
     # "maps/joel-demo.tmx",
-    "maps/Main-Spawn.tmx"
+    "maps/Main-Spawn.tmx",
+    "maps/Castle-Area.tmx",
+    "maps/Desert-Area.tmx",
+    "maps/Grass-Area.tmx",
+    "maps/Urban-Area.tmx",
+    # "maps/Main-Spawn.tmx",
+    "maps/falling-tile-demo.tmx"
 ]
 
 PLAYER_IMAGE_PATH = ":resources:images/animated_characters/male_person/malePerson_idle.png"
@@ -37,8 +43,12 @@ LAYER_NAME_NUMBER = "Numbers"
 LAYER_NAME_NUMBER_HITBOX = "number_hitbox"
 LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
 LAYER_NAME_NUMBER_TARGETS = "number_targets"
+LAYER_NAME_MATH_PROBLEM_ORIGIN = "math_problems"
 LAYER_NAME_EXIT = "exits"
 LAYER_NAME_PAGE = "page"
+
+# Falling tile
+LAYER_NAME_FALLING_TILE = "falling_tile"
 
 PLAYER_TEXTURES = []
 PAGE_TEXTURE = []
@@ -52,6 +62,14 @@ TARGET_BOX = "assets/kenney_sokobanpack/PNG/Default size/Crates/crate_29.png"
 TILE_SIZE = 32
 
 NUM_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Numbers/"
+
+# ******* DANGER ZONE *******
+# Brother Helfrich says to never do this stuff but I'm doing it anyway, sorry james
+GLOBAL_SCENE = None
+
+# Falling tile
+FALLING_TILE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/ground_03.png"
+FALLING_TILE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/"
 
 
 def pick_nearest_collision(subject: arcade.Sprite, collision_list):
