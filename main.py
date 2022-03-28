@@ -55,6 +55,10 @@ class MyGame(arcade.Window):
         layer_options = {
             LAYER_NAME_MATH_PROBLEM_ORIGIN: {
                 "custom_class": VisualMathProblemLocation
+            },
+            LAYER_NAME_WALLS: {
+                "hit_box_algorithm": "None",
+                "use_spatial_hash": True
             }
         }
         self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
@@ -70,14 +74,6 @@ class MyGame(arcade.Window):
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.exit_list = arcade.SpriteList()
 
-        # Make a test math problem
-        # self.problem = VisualMathProblem(self.scene, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 1, 10)
-        # self.problem.draw()
-
-        # Draw the programmatically generated math problems (No longer needed wiht VIsualMathPRoblemLocation's draw())
-        # for math_problem in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN).sprite_list:
-        #     math_problem.draw()
-
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
             self.player, [
@@ -89,31 +85,18 @@ class MyGame(arcade.Window):
         # ****** Dangerous code *******
         constant.GLOBAL_SCENE = self.scene
 
+        # Set up the math problems
+
+        for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
+            assert(isinstance(prob, VisualMathProblemLocation))
+            prob.setup(self.scene)
+
     def player_hit_door(self):
         collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
         if len(collisions) > 0:
             self.map_index += 1
             self.setup()
             print("We hit a door to advance to next level")
-
-    # def load_new_level(self):
-    #  """
-    #   load_new_level() has to be called from update.
-    # """
-
-    #   layer_options = {}
-    #  self.scene = arcade.Scene.from_tilemap(self.tile_map)
-    # self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
-    # if self.level == 1 :
-    #   self.level += 1
-    # if self.level == 2:
-    #   self.level+= 1
-    # if self.level == 3:
-    #   self.level += 1
-
-    # if self.player == exit and self.level == 1:
-    #   self.player == 2
-    #  self.player += 1
 
     def on_draw(self):
         """Render the screen."""
