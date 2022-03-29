@@ -2,7 +2,6 @@ import unittest
 import arcade
 from numbers_and_math import NumberBlockGroup, NumberBlock
 
-
 window = arcade.Window(200, 200, "test", resizable=True)
 arcade.set_window(window)
 

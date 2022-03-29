@@ -3,8 +3,8 @@ from math import sqrt
 
 import arcade
 
-SCREEN_WIDTH = 1600
-SCREEN_HEIGHT = 900
+SCREEN_WIDTH = 1500
+SCREEN_HEIGHT = 750
 
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""

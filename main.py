@@ -33,6 +33,7 @@ class MyGame(arcade.Window):
         self.score = None
         self.max_score = None
         self.problem_list = []
+        self.drawing_caption = False
 
         # Load Textures
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
@@ -87,7 +88,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
-        
+
         self.exit_list = arcade.SpriteList()
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
@@ -113,7 +114,6 @@ class MyGame(arcade.Window):
             self.max_score = len(self.problem_list)
         else:
             self.max_score = 0
-
 
     def setupFallingTileRoom(self):
         """
@@ -144,12 +144,10 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
-        
-
 
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
-       
+
         # self.scene.add_sprite("Player", self.player_sprite)
         self.exit_list = arcade.SpriteList()
         # self.scene.add_sprite("castle", self.castle_sprite)
@@ -199,7 +197,8 @@ class MyGame(arcade.Window):
         # Use the GUI Camera for the score and stuff
         self.gui_camera.use()
         self.draw_score()
-        self.caption()
+        if self.drawing_caption:
+            self.caption()
 
     def on_update(self, delta_time):
 
@@ -213,7 +212,6 @@ class MyGame(arcade.Window):
         # Update the player object
         self.player.update()
         self.page.update()
-        
 
         # Call update on the fallable tiles in the scene if necessary
         if self.is_falling_tile_map:
@@ -221,25 +219,24 @@ class MyGame(arcade.Window):
                 print("falling tile being updated")
                 tile.update()
 
-
     def update_score(self):
         temp_score = 0
         for problem in self.problem_list:
-            assert(isinstance(problem, VisualMathProblem))
+            assert (isinstance(problem, VisualMathProblem))
             if problem.is_solved():
                 temp_score += 1
         self.score = temp_score
-        
+
     def is_level_complete(self) -> bool:
         return self.score >= self.max_score
 
     def draw_score(self):
-        if self.max_score > 0: # Make sure we don't display score on a level without one (the main area)
+        if self.max_score > 0:  # Make sure we don't display score on a level without one (the main area)
             percentage = int(self.score / self.max_score * 100)
             arcade.draw_text(
                 text=f"Problems Completed: {self.score}/{self.max_score} ({percentage}%)",
-                start_x = 100,
-                start_y = 100,
+                start_x=100,
+                start_y=100,
                 font_size=25,
                 bold=True
             )
@@ -247,27 +244,33 @@ class MyGame(arcade.Window):
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
         self.page.on_key_press(symbol, modifiers)
-        
-        
 
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
 
+    def set_drawing_caption(self, displaying: bool):
+        self.drawing_caption = displaying
+
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
-        cap = "Press Space to lift it up"
+        cap = "Press Space to pick up the block"
 
         arcade.draw_text(
             cap,
             # self.view_left + SCREEN_WIDTH * 0.3,
             # self.view_bottom + SCREEN_HEIGHT * 0.8,
-            start_x=SCREEN_HEIGHT / 2,
-            start_y=SCREEN_HEIGHT / 2,
+            start_x=SCREEN_WIDTH - 100,
+            start_y=100,
+            width=600,
+            align="right",
+            anchor_x="right",
+            # anchor_y="center",
             color=arcade.csscolor.WHITE,
-            font_size=30
+            font_size=25,
+            bold=True
         )
- 
+
     def scroll_to_player(self):
 
         # --- Manage Scrolling ---

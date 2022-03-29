@@ -86,7 +86,8 @@ class NumberBlock(arcade.Sprite):
         self.symbol_sprite.center_y = y
 
     def auto_move(self):
-        collision_list = arcade.check_for_collision_with_list(self, self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
+        collision_list = arcade.check_for_collision_with_list(self,
+                                                              self.scene.get_sprite_list(LAYER_NAME_NUMBER_TARGETS))
         if len(collision_list) != 0:  # Player dropped the block on top of a Target Location
             assert (isinstance(collision_list[0], TargetLocation))
             self.target_location = pick_nearest_collision(self, collision_list)
@@ -168,7 +169,7 @@ class NumberBlockGroup:
         if isinstance(temp_val, str):
             blocks.append(self.block_template(self.scene, temp_val))
         else:
-            assert(temp_val >= 0)
+            assert (temp_val >= 0)
             finished = False
             multiplier = 1
             while not finished:
@@ -240,9 +241,9 @@ class NumberBlockGroup:
         return len(self._blocks)
 
     def is_correct(self):
-        assert(self.block_template == TargetLocation)
+        assert (self.block_template == TargetLocation)
         for target in self._blocks:
-            assert(isinstance(target, TargetLocation))
+            assert (isinstance(target, TargetLocation))
             if not target.is_correct():
                 return False
         return True
@@ -323,7 +324,6 @@ class SimpleMathProblem:
             if self.answer >= 0:
                 # Could be a decimal, but get_clean_problem() should take care of that
                 finished = True
-
 
     def setup(self, operator_str):
         self.min_value = 1
@@ -446,7 +446,6 @@ class VisualMathProblem:
         for block in self.draw_order:
             block.log()
 
-
     def is_solved(self) -> bool:
         """
         Function will check if the problem has been solved and will return True/False.
@@ -458,6 +457,7 @@ class VisualMathProblem:
         else:
             print("incorrect")
             return False
+
 
 class VisualMathProblemLocation(arcade.Sprite):
     def __init__(self,
