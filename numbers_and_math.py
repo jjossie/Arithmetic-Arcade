@@ -1,7 +1,7 @@
 import random
 import operator
 from enum import Enum
-
+import copy
 from constant import *
 
 
@@ -186,6 +186,9 @@ class NumberBlockGroup:
         self._update_value()
         self._update_textures()
 
+    def detach_right(self) -> NumberBlock:
+        return self._blocks.pop()
+
     def place_right(self, number_block):
         self._blocks.append(number_block)
         self._update_value()
@@ -333,6 +336,7 @@ class SimpleMathProblem:
         if operator_str is None:
             self.operator = self.get_random_operator()
         else:
+            print(operator_str)
             assert (operator_str in self.operators.keys())
             self.operator = operator_str
         self.answer = self.get_answer()
@@ -395,13 +399,18 @@ class VisualMathProblem:
         self.equals = NumberBlockGroup(scene=self.scene, from_number="=")
         # self.equals_target = TargetLocation(scene=self.scene, x=1000)
 
-        self.movable_blocks = []
-        for i in range(0, 10):
-            self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
-            self.movable_blocks.append(NumberBlock(scene=self.scene, value=i))
+
 
         self.answer_target = NumberBlockGroup(block_template=TargetLocation, scene=self.scene,
                                               from_number=self.problem.answer)
+
+        self.answer_blocks = NumberBlockGroup(block_template=NumberBlock, scene=self.scene,
+                                              from_number=self.problem.answer)
+
+        self.movable_blocks = self.answer_blocks._blocks
+
+        for i in range(0, 5):
+            self.movable_blocks.append(NumberBlock(scene=self.scene, value=random.randint(0, 9)))
 
         # Configure The Problem
         self.lhs.set_block_type(BlockType.IMMOVABLE)
@@ -414,8 +423,8 @@ class VisualMathProblem:
 
         self.draw_order = [self.lhs, self.operator, self.rhs, self.equals, self.answer_target]
 
-        self.answer_range_height = 480
-        self.answer_range_width = 1200
+        self.answer_range_height = 0
+        self.answer_range_width = 400
         self.answer_range_offset = 120
         self.answer_range_x_offset = 320
 
@@ -475,10 +484,12 @@ class VisualMathProblemLocation(arcade.Sprite):
                  hit_box_algorithm=None,
                  hit_box_detail=None,
                  texture=None,
-                 angle=None):
+                 angle=None,
+                 operator_str=None):
         super().__init__()
         self.vmp = None
+        self.operator = operator_str
 
     def setup(self, scene):
-        self.vmp = VisualMathProblem(scene, self.center_x, self.center_y)
+        self.vmp = VisualMathProblem(scene, self.center_x, self.center_y, operator_str=self.operator)
         self.vmp.draw()

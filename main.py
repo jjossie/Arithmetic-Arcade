@@ -32,6 +32,7 @@ class MyGame(arcade.Window):
         self.problem = None
         self.scene = None
         self.player = Player(self)
+        self.page = Page(self)
 
         # Some game status/logic
         self.is_falling_tile_map = False
@@ -77,7 +78,7 @@ class MyGame(arcade.Window):
         # Load the Tiled Map
         layer_options = {
             LAYER_NAME_MATH_PROBLEM_ORIGIN: {
-                "custom_class": VisualMathProblemLocation
+                "custom_class": VisualMathProblemLocation,
             },
             LAYER_NAME_WALLS: {
                 "hit_box_algorithm": "None",
@@ -106,10 +107,10 @@ class MyGame(arcade.Window):
         # Not sure why, but when I add this door the game will only ever start in this room.
         # I think it has something to do with the actual subtraction room setup function, but
         # I don't know what inside that would be casuing this to happen
-        # subtraction_door = Door("subtraction")
-        # subtraction_door.setCoordinates(500, 400)
-        # subtraction_door.setTargetPlayerCoordinates(600, 430)
-        # self.scene.add_sprite(LAYER_NAME_DOORS, subtraction_door)
+        subtraction_door = Door("subtraction")
+        subtraction_door.setCoordinates(300, 400)
+        subtraction_door.setTargetPlayerCoordinates(600, 430)
+        self.scene.add_sprite(LAYER_NAME_DOORS, subtraction_door)
 
         multiplication_door = Door("multiplication")
         multiplication_door.setCoordinates(600, 400)
@@ -122,8 +123,7 @@ class MyGame(arcade.Window):
         self.scene.add_sprite(LAYER_NAME_DOORS, division_door)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
 
-        self.exit_list = arcade.SpriteList()
-        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
 
         # Create the 'physics engine'
@@ -153,7 +153,6 @@ class MyGame(arcade.Window):
         for door in self.scene.get_sprite_list(LAYER_NAME_DOORS):
             if arcade.check_for_collision(self.player, door):
                 target = door.target_room_string
-                operand = door.room_operator
 
                 if target == "home":
                     self.setup()
@@ -231,9 +230,13 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)
+        self.page.on_key_press(symbol, modifiers)
 
     def on_key_release(self, symbol: int, modifiers: int):
         self.player.on_key_release(symbol, modifiers)
+
+    def set_drawing_caption(self, displaying: bool):
+        self.drawing_caption = displaying
 
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""

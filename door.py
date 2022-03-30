@@ -1,10 +1,4 @@
-import random
-import operator
-from enum import Enum
-
 from constant import *
-
-
 
 class Door(arcade.Sprite):
 

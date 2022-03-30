@@ -14,10 +14,10 @@ class Page(arcade.Sprite):
         self.texture = None
 
         PAGE_TEXTURE.append(
-            arcade.load_texture("assets\start.png")
+            arcade.load_texture("assets/start.png")
         )
         PAGE_TEXTURE.append(
-            arcade.load_texture("assets\end.png")
+            arcade.load_texture("assets/end.png")
         )
         PAGE_TEXTURE.append(
             arcade.load_texture("assets/transparent.png")
