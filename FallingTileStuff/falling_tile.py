@@ -38,7 +38,7 @@ class FallingTile(arcade.Sprite):
 
     def setup(self, scene):
 
-        print(f"FallingTile Scene: {scene}")
+        # print(f"FallingTile Scene: {scene}")
 
         self.player_sprite_list = scene.get_sprite_list(LAYER_NAME_PLAYER)
         
