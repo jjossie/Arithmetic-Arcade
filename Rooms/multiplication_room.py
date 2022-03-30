@@ -50,6 +50,6 @@ class MultiplicationRoom(Level):
 
         # Add the doors specific to this map
         home_door = Door("home")
-        home_door.setCoordinates(500, 500)
-        home_door.setTargetPlayerCoordinates(600, 330)
+        home_door.setCoordinates(1312, 1567)
+        home_door.setTargetPlayerCoordinates(322, 1110)
         self.scene.add_sprite(LAYER_NAME_DOORS, home_door)

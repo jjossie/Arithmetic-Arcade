@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="18" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="19" nextobjectid="7">
  <tileset firstgid="1" source="tilesets/roguelikeSheet_transparent_32px.tsx"/>
  <layer id="11" name="Better Grass" width="50" height="50">
   <data encoding="csv">
@@ -757,4 +757,18 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="18" name="Room Labels">
+  <object id="1" x="110.83" y="968.903" width="100" height="18.8438">
+   <text wrap="1" color="#ffffff">Multiplication</text>
+  </object>
+  <object id="2" x="981.462" y="201.383" width="86.63" height="18.8438">
+   <text wrap="1" color="#ffffff">Subtraction</text>
+  </object>
+  <object id="5" x="1457.98" y="967.995" width="58.63" height="18.8438">
+   <text wrap="1" color="#ffffff">Division</text>
+  </object>
+  <object id="6" x="977.33" y="1352.61" width="60.63" height="18.8438">
+   <text wrap="1" color="#ffffff">Addition</text>
+  </object>
+ </objectgroup>
 </map>

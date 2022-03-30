@@ -50,7 +50,7 @@ class DivisionRoom(Level):
 
         # Add the doors specific to this map
         home_door = Door("home")
-        home_door.setCoordinates(500, 500)
-        home_door.setTargetPlayerCoordinates(600, 300)
+        home_door.setCoordinates(544, 1630)
+        home_door.setTargetPlayerCoordinates(2976, 1099)
         self.scene.add_sprite(LAYER_NAME_DOORS, home_door)
 

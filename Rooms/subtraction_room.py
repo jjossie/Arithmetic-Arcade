@@ -57,6 +57,6 @@ class SubtractionRoom(Level):
             self.max_score = 0
 
         home_door = Door("home")
-        home_door.setCoordinates(500, 500)
-        home_door.setTargetPlayerCoordinates(400, 330)
+        home_door.setCoordinates(513, 33)
+        home_door.setTargetPlayerCoordinates(2050, 2645)
         self.scene.add_sprite(LAYER_NAME_DOORS, home_door)

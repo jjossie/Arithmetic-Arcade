@@ -104,26 +104,26 @@ class MyGame(arcade.Window):
 
         # Initialize Doors for map!
         addition_door = Door("addition")
-        addition_door.setCoordinates(400, 400)
-        addition_door.setTargetPlayerCoordinates(500, 430)
+        addition_door.setCoordinates(2016, 414)
+        addition_door.setTargetPlayerCoordinates(1696, 790)
         self.scene.add_sprite(LAYER_NAME_DOORS, addition_door)
 
         # Not sure why, but when I add this door the game will only ever start in this room.
         # I think it has something to do with the actual subtraction room setup function, but
         # I don't know what inside that would be causing this to happen
         subtraction_door = Door("subtraction")
-        subtraction_door.setCoordinates(300, 400)
-        subtraction_door.setTargetPlayerCoordinates(600, 430)
+        subtraction_door.setCoordinates(2050, 2718)
+        subtraction_door.setTargetPlayerCoordinates(513, 106)
         self.scene.add_sprite(LAYER_NAME_DOORS, subtraction_door)
 
         multiplication_door = Door("multiplication")
-        multiplication_door.setCoordinates(600, 400)
-        multiplication_door.setTargetPlayerCoordinates(500, 430)
+        multiplication_door.setCoordinates(322, 1182)
+        multiplication_door.setTargetPlayerCoordinates(1312, 1500)
         self.scene.add_sprite(LAYER_NAME_DOORS, multiplication_door)
 
         division_door = Door("division")
-        division_door.setCoordinates(700, 400)
-        division_door.setTargetPlayerCoordinates(500, 430)
+        division_door.setCoordinates(2976, 1182)
+        division_door.setTargetPlayerCoordinates(544, 1547)
         self.scene.add_sprite(LAYER_NAME_DOORS, division_door)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
 
