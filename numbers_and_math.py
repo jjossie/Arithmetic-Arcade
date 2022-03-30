@@ -427,6 +427,7 @@ class VisualMathProblem:
         self.answer_range_width = 400
         self.answer_range_offset = 120
         self.answer_range_x_offset = 320
+        self.answer_row_selection_padding = 100
 
     def draw(self):
         x = self.center_x
@@ -439,17 +440,14 @@ class VisualMathProblem:
             # Move over to the next space
             x += space * size + space
 
+        current_x_increment = 0
+        random.shuffle(self.movable_blocks)
         for block in self.movable_blocks:
             block.move_to(
-                random.randint(
-                    self.center_x - self.answer_range_width // 2,
-                    self.center_x + self.answer_range_width // 2
-                ) + self.answer_range_x_offset,
-                random.randint(
-                    self.center_y,
-                    self.center_y + self.answer_range_height
-                ) + self.answer_range_offset
+                self.center_x + current_x_increment, 
+                self.center_y + self.answer_range_offset
             )
+            current_x_increment += self.answer_row_selection_padding
 
     def log(self):
         for block in self.draw_order:
