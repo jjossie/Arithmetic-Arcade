@@ -1,3 +1,4 @@
+from distutils.core import setup
 import arcade
 from FallingTileStuff.falling_tile import FallingTile
 from numbers_and_math import VisualMathProblem, NumberBlock, VisualMathProblemLocation
@@ -8,6 +9,11 @@ from numbers_and_math import VisualMathProblem
 from pyglet.math import Vec2
 import constant
 from player import Player
+from door import Door
+from Rooms.addition_room import setupAdditionRoom
+from Rooms.subtraction_room import setupSubtractionRoom
+from Rooms.multiplication_room import setupMultiplicationRoom
+from Rooms.division_room import setupDivisionRoom
 
 
 class MyGame(arcade.Window):
@@ -51,6 +57,15 @@ class MyGame(arcade.Window):
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
+        # Room dictionary (make sure to add new rooms to this so the doors know which room to point to)
+        self.room_map = dict()
+        self.room_map["home"] = setup
+        self.room_map["addition"] = setupAdditionRoom
+        self.room_map["subtraction"] = setupSubtractionRoom
+        self.room_map["multiplication"] = setupMultiplicationRoom
+        self.room_map["division"] = setupDivisionRoom
+
+
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
         The map file must be loaded first, then the scene object can be initialized from that.
@@ -67,12 +82,6 @@ class MyGame(arcade.Window):
                 "hit_box_algorithm": "None",
                 "use_spatial_hash": True
             },
-            # This will only be needed when we're doing a falling tile room.
-            # LAYER_NAME_FALLING_TILE: {
-            #     "custom_class": FallingTile,
-            #     "custom_class_args": {
-            #     }
-            # }
         }
         self.tile_map = arcade.load_tilemap(MAPS[self.map_index], TILE_SCALING, layer_options)
 
@@ -84,8 +93,32 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list(LAYER_NAME_NUMBER)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
         self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
+        self.scene.add_sprite_list(LAYER_NAME_DOORS)
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
-        self.exit_list = arcade.SpriteList()
+
+        # Initialize Doors for map!
+        addition_door = Door("addition")
+        addition_door.setCoordinates(400, 400)
+        addition_door.setTargetPlayerCoordinates(500, 430)
+        self.scene.add_sprite(LAYER_NAME_DOORS, addition_door)
+
+        # Not sure why, but when I add this door the game will only ever start in this room.
+        # I think it has something to do with the actual subtraction room setup function, but
+        # I don't know what inside that would be casuing this to happen
+        # subtraction_door = Door("subtraction")
+        # subtraction_door.setCoordinates(500, 400)
+        # subtraction_door.setTargetPlayerCoordinates(600, 430)
+        # self.scene.add_sprite(LAYER_NAME_DOORS, subtraction_door)
+
+        multiplication_door = Door("multiplication")
+        multiplication_door.setCoordinates(600, 400)
+        multiplication_door.setTargetPlayerCoordinates(500, 430)
+        self.scene.add_sprite(LAYER_NAME_DOORS, multiplication_door)
+
+        division_door = Door("division")
+        division_door.setCoordinates(700, 400)
+        division_door.setTargetPlayerCoordinates(500, 430)
+        self.scene.add_sprite(LAYER_NAME_DOORS, division_door)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -96,7 +129,6 @@ class MyGame(arcade.Window):
         )
 
         # Set up the math problems
-
         for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
             assert (isinstance(prob, VisualMathProblemLocation))
             prob.setup(self.scene)
@@ -108,65 +140,31 @@ class MyGame(arcade.Window):
             self.max_score = len(self.problem_list)
         else:
             self.max_score = 0
-
-
-    def setupFallingTileRoom(self):
-        """
-            Set up the FallingTileRoom map/scene/stage/level here.
-        """
-        map_name = "maps/falling-tile-demo.tmx"
-        self.is_falling_tile_map = True
-
-        # Custom map options
-        layer_options = {
-            LAYER_NAME_FALLING_TILE: {
-                "custom_class": FallingTile,
-                "custom_class_args": {
-                }
-            }
-        }
-
-        # Load tile_map
-        self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
-
-        # Initialize Scene from the tilemap
-        self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        # repeat line 91 and line 88
-        # Create the Sprite lists
-        self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
-        self.scene.add_sprite_list(LAYER_NAME_PLAYER)
-        self.scene.add_sprite_list(LAYER_NAME_NUMBER)
-        self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
-        self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
-
-        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
-
-        self.exit_list = arcade.SpriteList()
-
-        for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE):
-            tile.setup(self.scene)
-
-        problems = [
-            VisualMathProblem(self.scene, 235, 1055, 1, 10, operator_str="-"),
-
-        ]
-        for problem in problems:
-            problem.draw()
-
-        # Create the 'physics engine'
-        self.physics_engine = arcade.PhysicsEngineSimple(
-            self.player, [
-                self.scene.get_sprite_list(LAYER_NAME_WALLS),
-                self.scene.get_sprite_list(LAYER_NAME_NUMBER)
-            ]
-        )
+    
 
     def player_hit_door(self):
-        collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_EXIT))
-        if len(collisions) > 0:
-            self.map_index += 1
-            self.setup()
-            print("We hit a door to advance to next level")
+        # collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_DOORS))
+        for door in self.scene.get_sprite_list(LAYER_NAME_DOORS):
+            if arcade.check_for_collision(self.player, door):
+                target = door.target_room_string
+                operand = door.room_operator
+
+                if target == "home":
+                    self.setup()
+                    self.player.center_x = door.player_center_x
+                    self.player.center_y = door.player_center_y
+                    print("We have returned home.")
+                else:
+                    self.room_map[target](self)
+                    self.player.center_x = door.player_center_x
+                    self.player.center_y = door.player_center_y
+                    print(f"We are now in the {target} room")
+
+
+        # if len(collisions) > 0:
+        #     self.map_index += 1
+        #     self.setup()
+        #     print("We hit a door to advance to next level")
 
     def on_draw(self):
         """Render the screen."""
