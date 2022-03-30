@@ -15,7 +15,7 @@ PLAYER_MOVEMENT_SPEED = 5
 PLAYER_RUN_MULTIPLIER = 1.5
 
 CAMERA_SPEED = 0.1
-VIEWPORT_MARGIN = 200
+VIEWPORT_MARGIN = 300
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 1
