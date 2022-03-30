@@ -10,10 +10,10 @@ from pyglet.math import Vec2
 import constant
 from player import Player
 from door import Door
-from Rooms.addition_room import setupAdditionRoom
-from Rooms.subtraction_room import setupSubtractionRoom
-from Rooms.multiplication_room import setupMultiplicationRoom
-from Rooms.division_room import setupDivisionRoom
+from Rooms.addition_room import AdditionRoom
+from Rooms.subtraction_room import SubtractionRoom
+from Rooms.multiplication_room import MultiplicationRoom
+from Rooms.division_room import DivisionRoom
 from page import Page
 
 
@@ -36,9 +36,14 @@ class MyGame(arcade.Window):
 
         # Some game status/logic
         self.is_falling_tile_map = False
-        self.score = None
-        self.max_score = None
-        self.problem_list = []
+        self.current_level = None
+        self.all_levels = {
+            "home": None,
+            "addition": AdditionRoom(),
+            "subtraction": SubtractionRoom(),
+            "multiplication": MultiplicationRoom(),
+            "division": DivisionRoom()
+        }
 
         # Load Textures
         PLAYER_TEXTURES.append(arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_02.png"))
@@ -62,11 +67,10 @@ class MyGame(arcade.Window):
         # Room dictionary (make sure to add new rooms to this so the doors know which room to point to)
         self.room_map = dict()
         self.room_map["home"] = setup
-        self.room_map["addition"] = setupAdditionRoom
-        self.room_map["subtraction"] = setupSubtractionRoom
-        self.room_map["multiplication"] = setupMultiplicationRoom
-        self.room_map["division"] = setupDivisionRoom
-
+        self.room_map["addition"] = AdditionRoom
+        self.room_map["subtraction"] = SubtractionRoom
+        self.room_map["multiplication"] = MultiplicationRoom
+        self.room_map["division"] = DivisionRoom
 
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
@@ -106,7 +110,7 @@ class MyGame(arcade.Window):
 
         # Not sure why, but when I add this door the game will only ever start in this room.
         # I think it has something to do with the actual subtraction room setup function, but
-        # I don't know what inside that would be casuing this to happen
+        # I don't know what inside that would be causing this to happen
         subtraction_door = Door("subtraction")
         subtraction_door.setCoordinates(300, 400)
         subtraction_door.setTargetPlayerCoordinates(600, 430)
@@ -123,7 +127,6 @@ class MyGame(arcade.Window):
         self.scene.add_sprite(LAYER_NAME_DOORS, division_door)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
 
-        # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
 
         # Create the 'physics engine'
@@ -140,30 +143,49 @@ class MyGame(arcade.Window):
             prob.setup(self.scene)
             self.problem_list.append(prob.vmp)
 
-        # Game Logic
-        self.score = 0
-        if self.problem_list is not None:
-            self.max_score = len(self.problem_list)
-        else:
-            self.max_score = 0
-    
-
     def player_hit_door(self):
-        # collisions = arcade.check_for_collision_with_list(self.player, self.scene.get_sprite_list(LAYER_NAME_DOORS))
         for door in self.scene.get_sprite_list(LAYER_NAME_DOORS):
             if arcade.check_for_collision(self.player, door):
                 target = door.target_room_string
 
                 if target == "home":
                     self.setup()
+                    self.current_level = None
                     self.player.center_x = door.player_center_x
                     self.player.center_y = door.player_center_y
                     print("We have returned home.")
                 else:
-                    self.room_map[target](self)
-                    self.player.center_x = door.player_center_x
-                    self.player.center_y = door.player_center_y
-                    print(f"We are now in the {target} room")
+                    self.setup_scene_from_level(target, door)
+
+    def setup_scene_from_level(self, target, door):
+
+        target_level = self.all_levels[target]
+        # If the last level we were in is the same as the one we're going to, we don't need to
+        # re-do all the setup stuff.
+        if self.current_level != target_level:
+            # Set the current level to the one we're trying to go into
+            self.current_level = target_level
+            self.scene = self.current_level.scene
+            try:
+                self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+            except ValueError as e:
+                pass
+            self.player.center_x = door.player_center_x
+            self.player.center_y = door.player_center_y
+            print(f"We are now in the {target} room")
+
+            self.physics_engine = arcade.PhysicsEngineSimple(
+                self.player, [
+                    self.scene.get_sprite_list(LAYER_NAME_WALLS),
+                    self.scene.get_sprite_list(LAYER_NAME_NUMBER)
+                ]
+            )
+
+    def update_score(self):
+        if self.current_level is not None:
+            self.current_level.update_score()
+        else:
+            print("No level to update the score for")
 
     def on_draw(self):
         """Render the screen."""
@@ -182,7 +204,8 @@ class MyGame(arcade.Window):
 
         # Use the GUI Camera for the score and stuff
         self.gui_camera.use()
-        self.draw_score()
+        if self.current_level is not None:
+            self.current_level.draw_score()
         if self.drawing_caption:
             self.caption()
 
@@ -204,29 +227,6 @@ class MyGame(arcade.Window):
             for tile in self.scene.get_sprite_list(LAYER_NAME_FALLING_TILE).sprite_list:
                 print("falling tile being updated")
                 tile.update()
-
-
-    def update_score(self):
-        temp_score = 0
-        for problem in self.problem_list:
-            assert(isinstance(problem, VisualMathProblem))
-            if problem.is_solved():
-                temp_score += 1
-        self.score = temp_score
-
-    def is_level_complete(self) -> bool:
-        return self.score >= self.max_score
-
-    def draw_score(self):
-        if self.max_score > 0: # Make sure we don't display score on a level without one (the main area)
-            percentage = int(self.score / self.max_score * 100)
-            arcade.draw_text(
-                text=f"Problems Completed: {self.score}/{self.max_score} ({percentage}%)",
-                start_x = 100,
-                start_y = 100,
-                font_size=25,
-                bold=True
-            )
 
     def on_key_press(self, symbol: int, modifiers: int):
         self.player.on_key_press(symbol, modifiers)

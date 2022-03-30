@@ -459,10 +459,8 @@ class VisualMathProblem:
         Basically an alias for self.answer_target.is_correct().
         """
         if self.answer_target.is_correct():
-            print("correct")
             return True
         else:
-            print("incorrect")
             return False
 
 

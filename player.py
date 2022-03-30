@@ -55,7 +55,10 @@ class Player(arcade.Sprite):
         """
         self.update_player_speed()
         self.texture_update()
-        self.check_for_block_collisions()
+        try:
+            self.check_for_block_collisions()
+        except AttributeError:
+            pass
         self._move_block()
         if self.block is not None and not self.space_pressed:
             self.release_block()
@@ -165,7 +168,11 @@ class Player(arcade.Sprite):
             if len(blocks) != 0:
                 assert (isinstance(blocks[0], NumberBlockHitbox))
                 hitbox: NumberBlockHitbox = pick_nearest_collision(self, blocks)
-                block: NumberBlock = hitbox.parent_block
+                try:
+                    block: NumberBlock = hitbox.parent_block
+                except AttributeError:
+                    print("Hitbox has no attached parent_block for some reason")
+                    raise AttributeError
                 # Make sure this block is actually a NumberBlock
                 assert (isinstance(block, NumberBlock))
                 if self.space_pressed:

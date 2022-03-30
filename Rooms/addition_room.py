@@ -4,62 +4,52 @@ It might make more sense to make this a class that contains all of the necessary
 """
 from constant import *
 from door import Door
-from numbers_and_math import VisualMathProblemLocation
+from numbers_and_math import VisualMathProblemLocation, VisualMathProblem
+from Level import Level
 
 
-def setupAdditionRoom(self):
-    map_name = "maps/Castle-Area.tmx"
-    room_operator = "+"
-    self.is_falling_tile_map = False
+class AdditionRoom(Level):
 
-    # Custom map options
-    layer_options = {
-        LAYER_NAME_MATH_PROBLEM_ORIGIN: {
-            "custom_class": VisualMathProblemLocation,
-            "custom_class_args": {
-                "operator_str": room_operator
-            }
-        },
-        LAYER_NAME_WALLS: {
-            "hit_box_algorithm": "None",
-            "use_spatial_hash": True
-        },
-    }
+    def __init__(self):
+        super().__init__()
 
-    # Load tile_map
-    self.tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
+        map_name = "maps/Castle-Area.tmx"
+        room_operator = "+"
+        self.is_falling_tile_map = False
 
-    # Initialize Scene from the tilemap
-    self.scene = arcade.Scene.from_tilemap(self.tile_map)
+        # Custom map options
+        layer_options = {
+            LAYER_NAME_MATH_PROBLEM_ORIGIN: {
+                "custom_class": VisualMathProblemLocation,
+                "custom_class_args": {
+                    "operator_str": room_operator
+                }
+            },
+            LAYER_NAME_WALLS: {
+                "hit_box_algorithm": "None",
+                "use_spatial_hash": True
+            },
+        }
 
-    # Create the Sprite lists
-    self.scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
-    self.scene.add_sprite_list(LAYER_NAME_PLAYER)
-    self.scene.add_sprite_list(LAYER_NAME_NUMBER)
-    self.scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
-    self.scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
-    self.scene.add_sprite_list(LAYER_NAME_DOORS)
+        # Make the scene and attach it to this Level
+        self.scene = self.make_scene(map_name, room_operator, layer_options)
 
-    # Sprites to add to lists above
-    self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        # Must be done AFTER scene is fully initialized
+        # Set up the math problems
+        for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
+            assert (isinstance(prob, VisualMathProblemLocation))
+            prob.setup(self.scene)
+            self.problem_list.append(prob.vmp)
 
-    home_door = Door("home")
-    home_door.setCoordinates(500, 500)
-    home_door.setTargetPlayerCoordinates(400, 330)
-    self.scene.add_sprite(LAYER_NAME_DOORS, home_door)
+        # Math Problem Logic
+        self.score = 0
+        if self.problem_list is not None:
+            self.max_score = len(self.problem_list)
+        else:
+            self.max_score = 0
 
-
-    # Create the 'physics engine'
-    self.physics_engine = arcade.PhysicsEngineSimple(
-        self.player, [
-            self.scene.get_sprite_list(LAYER_NAME_WALLS),
-            self.scene.get_sprite_list(LAYER_NAME_NUMBER)
-        ]
-    )
-
-
-    # Set up the math problems
-    for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
-        assert (isinstance(prob, VisualMathProblemLocation))
-        prob.setup(self.scene)
-        self.problem_list.append(prob.vmp)
+        # Add the doors specific to this map
+        home_door = Door("home")
+        home_door.setCoordinates(500, 500)
+        home_door.setTargetPlayerCoordinates(400, 330)
+        self.scene.add_sprite(LAYER_NAME_DOORS, home_door)
