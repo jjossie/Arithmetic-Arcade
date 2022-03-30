@@ -11,9 +11,9 @@ import constant
 from player import Player
 from door import Door
 from Rooms.addition_room import AdditionRoom
-from Rooms.subtraction_room import setupSubtractionRoom
-from Rooms.multiplication_room import setupMultiplicationRoom
-from Rooms.division_room import setupDivisionRoom
+from Rooms.subtraction_room import SubtractionRoom
+from Rooms.multiplication_room import MultiplicationRoom
+from Rooms.division_room import DivisionRoom
 from page import Page
 
 
@@ -40,9 +40,9 @@ class MyGame(arcade.Window):
         self.all_levels = {
             "home": None,
             "addition": AdditionRoom(),
-            "subtraction": None,
-            "multiplication": None,
-            "division": None
+            "subtraction": SubtractionRoom(),
+            "multiplication": MultiplicationRoom(),
+            "division": DivisionRoom()
         }
 
         # Load Textures
@@ -68,9 +68,9 @@ class MyGame(arcade.Window):
         self.room_map = dict()
         self.room_map["home"] = setup
         self.room_map["addition"] = AdditionRoom
-        self.room_map["subtraction"] = setupSubtractionRoom
-        self.room_map["multiplication"] = setupMultiplicationRoom
-        self.room_map["division"] = setupDivisionRoom
+        self.room_map["subtraction"] = SubtractionRoom
+        self.room_map["multiplication"] = MultiplicationRoom
+        self.room_map["division"] = DivisionRoom
 
     def setup(self):
         """Set up the current map/scene/stage/level here. Call this function to restart the game.
@@ -110,7 +110,7 @@ class MyGame(arcade.Window):
 
         # Not sure why, but when I add this door the game will only ever start in this room.
         # I think it has something to do with the actual subtraction room setup function, but
-        # I don't know what inside that would be casuing this to happen
+        # I don't know what inside that would be causing this to happen
         subtraction_door = Door("subtraction")
         subtraction_door.setCoordinates(300, 400)
         subtraction_door.setTargetPlayerCoordinates(600, 430)
@@ -127,7 +127,6 @@ class MyGame(arcade.Window):
         self.scene.add_sprite(LAYER_NAME_DOORS, division_door)
         self.scene.add_sprite_list(LAYER_NAME_PAGE)
 
-        # self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
         self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
 
         # Create the 'physics engine'
@@ -185,6 +184,8 @@ class MyGame(arcade.Window):
     def update_score(self):
         if self.current_level is not None:
             self.current_level.update_score()
+        else:
+            print("No level to update the score for")
 
     def on_draw(self):
         """Render the screen."""

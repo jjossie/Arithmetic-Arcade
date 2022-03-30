@@ -5,34 +5,14 @@ It might make more sense to make this a class that contains all of the necessary
 from constant import *
 from door import Door
 from numbers_and_math import VisualMathProblemLocation, VisualMathProblem
+from Level import Level
 
 
-class AdditionRoom:
+class AdditionRoom(Level):
 
     def __init__(self):
+        super().__init__()
 
-        # Score logic
-        self.is_falling_tile_map = None
-        self.score = None
-        self.max_score = None
-        self.problem_list = []
-
-        self.scene = self.make_scene()
-
-        # Set up the math problems
-        for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
-            assert (isinstance(prob, VisualMathProblemLocation))
-            prob.setup(self.scene)
-            self.problem_list.append(prob.vmp)
-
-        # Game Logic
-        self.score = 0
-        if self.problem_list is not None:
-            self.max_score = len(self.problem_list)
-        else:
-            self.max_score = 0
-
-    def make_scene(self):
         map_name = "maps/Castle-Area.tmx"
         room_operator = "+"
         self.is_falling_tile_map = False
@@ -51,55 +31,25 @@ class AdditionRoom:
             },
         }
 
-        # Load tile_map
-        tile_map = arcade.load_tilemap(map_name, TILE_SCALING, layer_options)
+        # Make the scene and attach it to this Level
+        self.scene = self.make_scene(map_name, room_operator, layer_options)
 
-        # Initialize Scene from the tilemap
-        scene = arcade.Scene.from_tilemap(tile_map)
+        # Must be done AFTER scene is fully initialized
+        # Set up the math problems
+        for prob in self.scene.get_sprite_list(LAYER_NAME_MATH_PROBLEM_ORIGIN):
+            assert (isinstance(prob, VisualMathProblemLocation))
+            prob.setup(self.scene)
+            self.problem_list.append(prob.vmp)
 
-        # Create the Sprite lists
-        scene.add_sprite_list(LAYER_NAME_NUMBER_TARGETS)
-        scene.add_sprite_list(LAYER_NAME_PLAYER)
-        scene.add_sprite_list(LAYER_NAME_NUMBER)
-        scene.add_sprite_list(LAYER_NAME_NUMBER_SYMBOLS)
-        scene.add_sprite_list(LAYER_NAME_NUMBER_HITBOX)
-        scene.add_sprite_list(LAYER_NAME_DOORS)
+        # Math Problem Logic
+        self.score = 0
+        if self.problem_list is not None:
+            self.max_score = len(self.problem_list)
+        else:
+            self.max_score = 0
 
-        # Sprites to add to lists above
-
+        # Add the doors specific to this map
         home_door = Door("home")
         home_door.setCoordinates(500, 500)
         home_door.setTargetPlayerCoordinates(400, 330)
-        scene.add_sprite(LAYER_NAME_DOORS, home_door)
-
-        # Create the 'physics engine'
-        # self.physics_engine = arcade.PhysicsEngineSimple(
-        #     self.player, [
-        #         scene.get_sprite_list(LAYER_NAME_WALLS),
-        #         scene.get_sprite_list(LAYER_NAME_NUMBER)
-        #     ]
-        # )
-
-        return scene
-
-    def update_score(self):
-        temp_score = 0
-        for problem in self.problem_list:
-            assert (isinstance(problem, VisualMathProblem))
-            if problem.is_solved():
-                temp_score += 1
-        self.score = temp_score
-
-    def is_level_complete(self) -> bool:
-        return self.score >= self.max_score
-
-    def draw_score(self):
-        if self.max_score > 0:  # Make sure we don't display score on a level without one (the main area)
-            percentage = int(self.score / self.max_score * 100)
-            arcade.draw_text(
-                text=f"Problems Completed: {self.score}/{self.max_score} ({percentage}%)",
-                start_x=100,
-                start_y=100,
-                font_size=25,
-                bold=True
-            )
+        self.scene.add_sprite(LAYER_NAME_DOORS, home_door)
