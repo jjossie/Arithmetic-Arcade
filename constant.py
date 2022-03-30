@@ -3,8 +3,8 @@ from math import sqrt
 
 import arcade
 
-SCREEN_WIDTH = 1600
-SCREEN_HEIGHT = 900
+SCREEN_WIDTH = 1500
+SCREEN_HEIGHT = 750
 
 SCREEN_TITLE = "RUNTIME TERROR"
 MAP = ""
@@ -46,11 +46,13 @@ LAYER_NAME_NUMBER_TARGETS = "number_targets"
 LAYER_NAME_MATH_PROBLEM_ORIGIN = "math_problems"
 LAYER_NAME_EXIT = "exits"
 LAYER_NAME_DOORS = "doors"
+LAYER_NAME_PAGE = "page"
 
 # Falling tile
 LAYER_NAME_FALLING_TILE = "falling_tile"
 
 PLAYER_TEXTURES = []
+PAGE_TEXTURE = []
 IMG_PATH_EXT = ".png"
 
 CRATE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Crates/"

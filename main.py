@@ -14,6 +14,7 @@ from Rooms.addition_room import setupAdditionRoom
 from Rooms.subtraction_room import setupSubtractionRoom
 from Rooms.multiplication_room import setupMultiplicationRoom
 from Rooms.division_room import setupDivisionRoom
+from page import Page
 
 
 class MyGame(arcade.Window):
@@ -119,6 +120,11 @@ class MyGame(arcade.Window):
         division_door.setCoordinates(700, 400)
         division_door.setTargetPlayerCoordinates(500, 430)
         self.scene.add_sprite(LAYER_NAME_DOORS, division_door)
+        self.scene.add_sprite_list(LAYER_NAME_PAGE)
+
+        self.exit_list = arcade.SpriteList()
+        self.scene.add_sprite(LAYER_NAME_PLAYER, self.player)
+        self.scene.add_sprite(LAYER_NAME_PAGE, self.page)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEngineSimple(
@@ -160,12 +166,6 @@ class MyGame(arcade.Window):
                     self.player.center_y = door.player_center_y
                     print(f"We are now in the {target} room")
 
-
-        # if len(collisions) > 0:
-        #     self.map_index += 1
-        #     self.setup()
-        #     print("We hit a door to advance to next level")
-
     def on_draw(self):
         """Render the screen."""
 
@@ -184,7 +184,8 @@ class MyGame(arcade.Window):
         # Use the GUI Camera for the score and stuff
         self.gui_camera.use()
         self.draw_score()
-        self.caption()
+        if self.drawing_caption:
+            self.caption()
 
     def on_update(self, delta_time):
 
@@ -197,6 +198,7 @@ class MyGame(arcade.Window):
 
         # Update the player object
         self.player.update()
+        self.page.update()
 
         # Call update on the fallable tiles in the scene if necessary
         if self.is_falling_tile_map:
@@ -212,7 +214,7 @@ class MyGame(arcade.Window):
             if problem.is_solved():
                 temp_score += 1
         self.score = temp_score
-        
+
     def is_level_complete(self) -> bool:
         return self.score >= self.max_score
 
@@ -236,18 +238,23 @@ class MyGame(arcade.Window):
     def caption(self):
         """This Function is to display the caption when it touches the boxes"""
 
-        cap = "Press Space to lift it up"
+        cap = "Press Space to pick up the block"
 
         arcade.draw_text(
             cap,
             # self.view_left + SCREEN_WIDTH * 0.3,
             # self.view_bottom + SCREEN_HEIGHT * 0.8,
-            start_x=SCREEN_HEIGHT / 2,
-            start_y=SCREEN_HEIGHT / 2,
+            start_x=SCREEN_WIDTH - 100,
+            start_y=100,
+            width=600,
+            align="right",
+            anchor_x="right",
+            # anchor_y="center",
             color=arcade.csscolor.WHITE,
-            font_size=30
+            font_size=25,
+            bold=True
         )
- 
+
     def scroll_to_player(self):
 
         # --- Manage Scrolling ---

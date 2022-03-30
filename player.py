@@ -81,26 +81,6 @@ class Player(arcade.Sprite):
         elif self.right_pressed and not self.left_pressed:
             self.change_x = speed
 
-        # This does not allow the player go over
-        # if self.center_x < (VIEWPORT_MARGIN * 6 / 5):
-        #     if self.center_x <= (VIEWPORT_MARGIN / 10):
-        #         self.center_x = (VIEWPORT_MARGIN / 10)
-        # else:
-        #     self.window.scroll_to_player()
-        # if self.center_y < (VIEWPORT_MARGIN * 1.2):
-        #     if self.center_y <= (VIEWPORT_MARGIN / 10):
-        #         self.center_y = (VIEWPORT_MARGIN / 10)
-        # else:
-        #     self.window.scroll_to_player()
-        # if self.center_x > (MAP_SIZE - VIEWPORT_MARGIN * 0.8):
-        #     if self.center_x >= (MAP_SIZE + 20):
-        #         self.center_x = (MAP_SIZE + 20)
-        # else:
-        #     self.window.scroll_to_player()
-        # if self.center_y > (MAP_SIZE - VIEWPORT_MARGIN * 0.8):
-        #     if self.center_y >= (MAP_SIZE + VIEWPORT_MARGIN / 5):
-        #         self.center_y = (MAP_SIZE + VIEWPORT_MARGIN / 5)
-        # else:
         self.window.scroll_to_player()
 
     def on_key_press(self, key, modifiers):
@@ -157,6 +137,8 @@ class Player(arcade.Sprite):
                 or block.block_type == BlockType.INCORRECT:
             self.block = block
             self._block_position_offset = self._get_block_position_offset()
+            block.remove_from_sprite_lists()
+            self.window.scene.get_sprite_list(LAYER_NAME_PLAYER).append(block)
 
     def release_block(self):
         """
@@ -167,6 +149,8 @@ class Player(arcade.Sprite):
         # This makes it so the player only drops off the block once the space bar is released.
         # Reduces the amount of collision checking that has to happen which should improve performance.
         self.block.auto_move()
+        self.block.remove_from_sprite_lists()
+        self.window.scene.get_sprite_list(LAYER_NAME_NUMBER).append(self.block)
         self.block = None
         self.window.update_score()
 
@@ -186,8 +170,13 @@ class Player(arcade.Sprite):
                 assert (isinstance(block, NumberBlock))
                 if self.space_pressed:
                     self.grab_block(block)
+                    self.window.set_drawing_caption(False)
                 else:
-                    self.window.caption()
+                    if block.block_type == BlockType.MOVABLE \
+                            or block.block_type == BlockType.INCORRECT:
+                        self.window.set_drawing_caption(True)
+            else:
+                self.window.set_drawing_caption(False)
 
     def _move_block(self):
         """
