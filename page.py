@@ -9,8 +9,8 @@ class Page(arcade.Sprite):
         self.window = window
         self.begin = True
         self.end = False
-        self.center_x = SCREEN_WIDTH / 2
-        self.center_y = SCREEN_HEIGHT / 2
+        self.center_x = 1400
+        self.center_y = 1800
         self.texture = None
 
         PAGE_TEXTURE.append(

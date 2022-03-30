@@ -58,6 +58,8 @@ class MyGame(arcade.Window):
         self.tile_map = None  # This will hold the actual TileMap object loaded from the .tmx file
 
         self.camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
+        position = Vec2(680, 1375)
+        self.camera.position = position
         self.gui_camera = arcade.Camera(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.view_bottom = 0
         self.view_left = 0
@@ -78,6 +80,8 @@ class MyGame(arcade.Window):
         Then the player sprite can be loaded and added to the scene afterward so that they draw
         in the proper order.
         """
+        
+
         self.is_falling_tile_map = False
         # Load the Tiled Map
         layer_options = {

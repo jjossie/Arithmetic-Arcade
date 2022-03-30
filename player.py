@@ -38,8 +38,8 @@ class Player(arcade.Sprite):
             arcade.load_texture("assets/kenney_sokobanpack/PNG/Default size/Player/player_17.png"))  # Right
 
         # Set up the player, specifically placing it at these coordinates.
-        self.center_x = 500
-        self.center_y = 375
+        self.center_x = 1860
+        self.center_y = 1800
         self.scale = CHARACTER_SCALING
         self.texture = PLAYER_TEXTURES[0]
 
