@@ -45,6 +45,7 @@ LAYER_NAME_NUMBER_SYMBOLS = "number_symbols"
 LAYER_NAME_NUMBER_TARGETS = "number_targets"
 LAYER_NAME_MATH_PROBLEM_ORIGIN = "math_problems"
 LAYER_NAME_EXIT = "exits"
+LAYER_NAME_DOORS = "doors"
 
 # Falling tile
 LAYER_NAME_FALLING_TILE = "falling_tile"
@@ -69,6 +70,7 @@ GLOBAL_SCENE = None
 FALLING_TILE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/ground_03.png"
 FALLING_TILE_BASE_PATH = "assets/kenney_sokobanpack/PNG/Default size/Ground/"
 
+DOOR_TEXTURE = "assets/roguelike-pack/IndividualTextures/Door.png"
 
 def pick_nearest_collision(subject: arcade.Sprite, collision_list):
     target = None
