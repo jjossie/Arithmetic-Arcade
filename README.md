@@ -38,7 +38,7 @@ We are able to know if the answers are correct according to the colors of the bl
 # Future Work
 
 
-* Adding more ladnscapes
+* Adding more landscapes
 * Making some interactions with the map
 * Adding a boss as a level
 * Having player do more than just finding algebra answers
